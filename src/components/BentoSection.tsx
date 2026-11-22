@@ -17,6 +17,7 @@ import {
   FiverrIcon,
 } from '@/components/ui/material-symbols';
 import { PERSONAL_INFO, PROJECTS } from '@/data/portfolioData';
+import DiscordPresenceCard from '@/components/DiscordPresenceCard';
 
 // 1:1 Exact Geometric & Organic Vector Masks from Shape Reference Catalog (Non-clipping, wide interior)
 const CUSTOM_MASKS = {
@@ -31,6 +32,9 @@ const CUSTOM_MASKS = {
 
   // 4. Pill / Tilted Pebble (Row 2, Col 2 in reference) - Card 4: selected highlights
   pill: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none'%3E%3Cpath fill='currentColor' d='M 36,8 C 58,-1 80,6 91,24 C 102,42 98,68 84,85 C 70,100 42,98 25,86 C 8,72 0,48 8,30 C 14,16 23,10 36,8 Z'/%3E%3C/svg%3E")`,
+
+  // 5. Star / Sparkle (Row 1, Col 4 in reference) - Card 5: discord presence
+  star4: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none'%3E%3Cpath fill='currentColor' d='M 50,2 C 54,26 74,46 98,50 C 74,54 54,74 50,98 C 46,74 26,54 2,50 C 26,46 46,26 50,2 Z'/%3E%3C/svg%3E")`,
 };
 
 function OrganicIconBadge({
@@ -116,11 +120,11 @@ export default function BentoSection() {
         >
           <div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white text-balance">
-              creations &amp; craft<span className="text-[#888888]">.</span>
+              identity &amp; craft<span className="text-[#888888]">.</span>
             </h2>
           </div>
           <p className="text-xs sm:text-base text-zinc-100 max-w-md font-medium leading-relaxed text-pretty text-right sm:self-end ml-auto">
-            An organic bento composition of technical capabilities, character animation, and fullstack engineering.
+            An organic bento hub spanning personal identity, live presence, capabilities, and selected works.
           </p>
         </motion.div>
 
@@ -233,6 +237,30 @@ export default function BentoSection() {
                     );
                   })}
                 </div>
+              </div>
+            </motion.div>
+
+            {/* ---------------- CARD 5: discord presence ---------------- */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.4, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
+              className="order-5 lg:order-none w-full bg-[#161618]/95 border border-[#27272a] rounded-[28px] p-5 sm:p-7 md:p-8 flex flex-col justify-between shadow-sm"
+            >
+              <div>
+                {/* Custom Organic Top Icon Badge (Star - Theme White) */}
+                <OrganicIconBadge mask={CUSTOM_MASKS.star4} bg="bg-white" textColor="text-zinc-950">
+                  <DiscordIcon className="size-5" />
+                </OrganicIconBadge>
+
+                {/* Title */}
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-4 sm:mb-5">
+                  discord presence
+                </h3>
+
+                {/* Live Discord Status Widget */}
+                <DiscordPresenceCard />
               </div>
             </motion.div>
           </div>

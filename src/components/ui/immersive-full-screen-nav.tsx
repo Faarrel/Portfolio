@@ -591,7 +591,7 @@ export interface CustomNavbarProps {
 function CustomNavbar({
   links = [
     { label: "Home", href: "#hero" },
-    { label: "Creations & Craft", href: "#work" },
+    { label: "Identity & Craft", href: "#work" },
     { label: "Let's Talk", href: "#contact" },
   ],
   images = [],
@@ -728,7 +728,7 @@ const NAV_CONTENT: Partial<CustomNavbarProps> = {
   location: "Indonesia",
   links: [
     { label: "Home", href: "#hero" },
-    { label: "Creations & Craft", href: "#work" },
+    { label: "Identity & Craft", href: "#work" },
     { label: "Let's Talk", href: "#contact" },
   ],
   images: [],
