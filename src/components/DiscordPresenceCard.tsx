@@ -178,10 +178,11 @@ export default function DiscordPresenceCard() {
 
   const avatarUrl = lanyard?.discord_user?.avatar
     ? `https://cdn.discordapp.com/avatars/${DISCORD_USER_ID}/${lanyard.discord_user.avatar}.png?size=128`
-    : '/logo.png';
+    : 'https://cdn.discordapp.com/avatars/938045579215380510/7395402e2522fb277f4577f23d0bffc0.webp?size=160';
 
-  const avatarDecorationUrl = lanyard?.discord_user?.avatar_decoration_data?.asset
-    ? `https://cdn.discordapp.com/avatar-decoration-presets/${lanyard.discord_user.avatar_decoration_data.asset}.png`
+  const decorationAsset = lanyard?.discord_user?.avatar_decoration_data?.asset || 'a_838e8568d3798c688a05c696ec6bed5f';
+  const avatarDecorationUrl = decorationAsset
+    ? `https://cdn.discordapp.com/avatar-decoration-presets/${decorationAsset}.png?size=160&passthrough=true`
     : null;
 
   const activityImageUrl = primaryActivity
@@ -201,11 +202,11 @@ export default function DiscordPresenceCard() {
     <div className="rounded-2xl overflow-hidden bg-[#202024] border border-[#27272a] p-4 sm:p-5 flex flex-col justify-between gap-4">
       {/* Header: Avatar, Name, Handle, Badges, Status */}
       <div className="flex items-center gap-3.5 min-w-0">
-        <div className="relative shrink-0">
+        <div className="relative shrink-0 size-12 sm:size-14 flex items-center justify-center">
           <img
             src={avatarUrl}
             alt="Discord Avatar"
-            className="size-12 sm:size-13 rounded-full object-cover bg-[#2a2a30] border border-white/10"
+            className="size-full rounded-full object-cover bg-[#2a2a30] border border-white/10"
             onError={(e) => {
               (e.target as HTMLElement).setAttribute('src', '/logo.png');
             }}
@@ -214,7 +215,15 @@ export default function DiscordPresenceCard() {
             <img
               src={avatarDecorationUrl}
               alt="Avatar Decoration"
-              className="absolute -top-2.5 -left-2.5 size-17 sm:size-18 pointer-events-none select-none z-10"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] max-w-none pointer-events-none select-none z-10 object-contain aspect-square"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                if (!target.src.includes('collectibles-shop')) {
+                  target.src = 'https://cdn.discordapp.com/media/v1/collectibles-shop/1555329586768642148/static';
+                } else {
+                  target.style.display = 'none';
+                }
+              }}
             />
           )}
           {/* Status dot */}
@@ -236,6 +245,9 @@ export default function DiscordPresenceCard() {
             >
               @{PERSONAL_INFO.discordHandle} {copied && <span className="text-emerald-400 font-sans text-[10px]">(copied!)</span>}
             </button>
+            <span className="text-[11px] text-zinc-500 font-normal shrink-0">
+              · hyperpop
+            </span>
 
             {/* Discord Badges */}
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#18181b] border border-white/5 shrink-0">
