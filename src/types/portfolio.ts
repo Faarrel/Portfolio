@@ -24,6 +24,7 @@ export interface ProjectItem {
   externalLabel?: string;
   externalType?: 'fiverr' | 'discord' | 'github' | 'external';
   previewUrl?: string;
+  gallery?: string[];
   clientReview?: ClientReview;
   details: string[];
 }

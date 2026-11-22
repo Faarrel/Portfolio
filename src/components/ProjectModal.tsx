@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CloseIcon,
@@ -25,6 +25,7 @@ export interface ProjectModalItem {
   externalLabel?: string;
   externalType?: 'fiverr' | 'discord' | 'github' | 'external';
   previewUrl?: string;
+  gallery?: string[];
   clientReview?: {
     author: string;
     rating: number;
@@ -39,12 +40,20 @@ interface ProjectModalProps {
 }
 
 export default function ProjectModal({ item, onClose }: ProjectModalProps) {
+  const [activeLightboxMedia, setActiveLightboxMedia] = useState<string | null>(null);
+
   // Close on Escape key & lock body scroll
   useEffect(() => {
     if (!item) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === 'Escape') {
+        if (activeLightboxMedia) {
+          setActiveLightboxMedia(null);
+        } else {
+          onClose();
+        }
+      }
     };
 
     const originalOverflow = document.body.style.overflow;
@@ -55,12 +64,12 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
       document.body.style.overflow = originalOverflow;
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [item, onClose]);
+  }, [item, onClose, activeLightboxMedia]);
 
   return (
     <AnimatePresence>
       {item && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-hidden">
           {/* Backdrop with frosted dark blur */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -73,20 +82,20 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
 
           {/* Modal Dialog Card */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 20 }}
+            initial={{ opacity: 0, scale: 0.96, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 20 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full sm:max-w-xl md:max-w-2xl max-h-[92dvh] sm:max-h-[88vh] bg-[#161618] border border-[#27272a] rounded-t-[24px] sm:rounded-[24px] shadow-2xl z-10 flex flex-col overflow-hidden"
+            exit={{ opacity: 0, scale: 0.96, y: 16 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            className="relative w-full max-w-lg sm:max-w-xl md:max-w-2xl max-h-[88vh] max-h-[88dvh] bg-[#161618] border border-[#27272a] rounded-[20px] sm:rounded-[24px] shadow-2xl z-10 flex flex-col overflow-hidden"
           >
-            {/* Sticky Top Header */}
-            <div className="sticky top-0 z-20 bg-[#161618]/95 backdrop-blur-md px-5 sm:px-6 py-3.5 border-b border-white/[0.08] flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300 bg-white/5 border border-white/10 px-3 py-1 rounded-full">
+            {/* Header: Fixed top bar */}
+            <div className="shrink-0 bg-[#161618] px-4 sm:px-6 py-3 border-b border-white/[0.08] flex items-center justify-between">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300 bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-full shrink-0">
                   {item.categoryLabel || 'Showcase'}
                 </span>
                 {item.metrics && (
-                  <span className="hidden sm:inline-block text-xs font-mono font-medium text-zinc-400 bg-[#202024] border border-[#27272a] px-2.5 py-0.5 rounded-md truncate max-w-[220px]">
+                  <span className="hidden sm:inline-block text-xs font-mono font-medium text-zinc-400 bg-[#202024] border border-[#27272a] px-2 py-0.5 rounded-md truncate max-w-[220px]">
                     ⏱ {item.metrics}
                   </span>
                 )}
@@ -102,24 +111,63 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
               </button>
             </div>
 
-            {/* Scrollable Content Area */}
-            <div className="flex-1 overflow-y-auto overscroll-contain p-5 sm:p-6 space-y-4">
-              {/* Media Preview (GIF / Video / Image from Fiverr or Local CDN) */}
-              {item.previewUrl && (
-                <div className="relative w-full rounded-xl overflow-hidden bg-black/60 border border-white/10 aspect-video sm:aspect-[16/9] flex items-center justify-center">
+            {/* Scrollable Content Area: strictly constrained by min-h-0 to avoid overflow */}
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4">
+              {/* Media Collage / Gallery */}
+              {item.gallery && item.gallery.length > 0 ? (
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between text-xs text-zinc-400">
+                    <span className="text-[11px] uppercase tracking-wider font-semibold">
+                      Gallery &amp; Delivered Works ({item.gallery.length})
+                    </span>
+                    <span className="text-[11px] text-zinc-500">
+                      Tap image to enlarge
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {item.gallery.map((mediaUrl, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setActiveLightboxMedia(mediaUrl)}
+                        className="relative aspect-square sm:aspect-[4/3] rounded-xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all hover:scale-[1.02] shadow-sm flex items-center justify-center"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={mediaUrl}
+                          alt={`${item.title} preview ${idx + 1}`}
+                          className="w-full h-full object-contain p-1"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[11px] font-semibold gap-1">
+                          <span>View 🔍</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : item.previewUrl ? (
+                <button
+                  type="button"
+                  onClick={() => setActiveLightboxMedia(item.previewUrl!)}
+                  className="relative w-full rounded-xl overflow-hidden bg-black/50 border border-white/10 aspect-video sm:aspect-[16/9] flex items-center justify-center group cursor-pointer hover:border-white/30 transition-all"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={item.previewUrl}
                     alt={item.title}
-                    className="w-full h-full object-contain sm:object-cover"
+                    className="w-full h-full object-contain p-2"
                     loading="eager"
                   />
-                </div>
-              )}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1">
+                    <span>Tap to enlarge 🔍</span>
+                  </div>
+                </button>
+              ) : null}
 
               {/* Title & Metadata */}
               <div>
-                <h3 className="text-lg sm:text-2xl font-bold tracking-tight text-white leading-tight">
+                <h3 className="text-lg sm:text-xl font-bold tracking-tight text-white leading-tight">
                   {item.title}
                 </h3>
 
@@ -130,13 +178,13 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                 )}
 
                 {item.metrics && (
-                  <div className="sm:hidden inline-block mt-2 text-xs font-mono font-medium text-zinc-400 bg-[#202024] border border-[#27272a] px-2.5 py-0.5 rounded-md">
+                  <div className="sm:hidden inline-block mt-2 text-xs font-mono font-medium text-zinc-400 bg-[#202024] border border-[#27272a] px-2 py-0.5 rounded-md">
                     ⏱ {item.metrics}
                   </div>
                 )}
               </div>
 
-              {/* Concise Description */}
+              {/* Description */}
               <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-normal">
                 {item.description}
               </p>
@@ -192,8 +240,8 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
               )}
             </div>
 
-            {/* Sticky Bottom Action Bar */}
-            <div className="sticky bottom-0 z-20 bg-[#161618]/95 backdrop-blur-md px-5 sm:px-6 py-3 border-t border-white/[0.08] flex items-center justify-between gap-2.5 shrink-0">
+            {/* Footer: Fixed bottom action bar */}
+            <div className="shrink-0 bg-[#161618] px-4 sm:px-6 py-3 border-t border-white/[0.08] flex items-center justify-between gap-2.5">
               <div className="flex items-center gap-2">
                 {item.externalUrl && (
                   <a
@@ -242,6 +290,44 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
               </a>
             </div>
           </motion.div>
+
+          {/* Lightbox / Zoomed Preview Modal */}
+          <AnimatePresence>
+            {activeLightboxMedia && (
+              <div className="fixed inset-0 z-60 flex items-center justify-center p-3 sm:p-6 md:p-8">
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => setActiveLightboxMedia(null)}
+                  className="fixed inset-0 bg-black/95 backdrop-blur-xl cursor-pointer"
+                />
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.92 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.92 }}
+                  transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                  className="relative max-w-4xl max-h-[90vh] z-10 flex flex-col items-center justify-center p-2"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={activeLightboxMedia.replace('t_delivery_thumb,', '')}
+                    alt="Enlarged preview"
+                    className="max-w-full max-h-[80vh] object-contain rounded-xl border border-white/20 shadow-2xl bg-black/80"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setActiveLightboxMedia(null)}
+                    aria-label="Close enlarged preview"
+                    className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-xs font-medium text-white transition-colors cursor-pointer"
+                  >
+                    <CloseIcon className="size-3.5" />
+                    <span>Close Preview</span>
+                  </button>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
         </div>
       )}
     </AnimatePresence>

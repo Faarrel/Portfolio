@@ -89,6 +89,7 @@ export default function BentoSection() {
         tools: ['Photoshop', 'Alight Motion', 'Illustrator', 'Figma'],
         metrics: '300+ Delivered Orders · 4.9 Rating',
         previewUrl: 'https://fiverr-res.cloudinary.com/image/upload/t_delivery_thumb,q_auto,f_auto/v1/attachments/delivery/asset/80384ee983d0369bf97679af69f512ed-1744382455/giv.gif',
+        gallery: PROJECTS[3].gallery,
         details: [
           'Brand identity suites, logotypes, stream overlays, and banner graphics',
           'Aesthetic monochrome and anime/cyberpunk creative compositions',
@@ -117,6 +118,7 @@ export default function BentoSection() {
         tools: ['After Effects', 'Photoshop', 'Alight Motion'],
         metrics: '136+ Reviews · 5.0 Rating · 60 FPS Loops',
         previewUrl: 'https://fiverr-res.cloudinary.com/image/upload/t_delivery_thumb,q_auto,f_auto/v1/attachments/delivery/asset/9cfc3526fec9e2c07f10d5305eb57165-1750905742/ezgif.com-resize.gif',
+        gallery: PROJECTS[0].gallery,
         details: [
           'Natural eye blinking, hair physics sway, and chest breathing motion cycles',
           'Lightweight 60 FPS web-ready deliverables (GIF, APNG, MP4)',
@@ -145,6 +147,7 @@ export default function BentoSection() {
         tools: ['Discord API', 'Security Bots', 'Role Hierarchy'],
         metrics: '45,000+ Members Managed · 0 Raid Breaches',
         previewUrl: 'https://fiverr-res.cloudinary.com/image/upload/t_delivery_thumb,q_auto,f_auto/v1/attachments/delivery/asset/3e1924c7d8dabb27526975cc6bf5793e-1721827595/spartan-ezgif.com-resize.gif',
+        gallery: PROJECTS[4].gallery,
         details: [
           'Tiered role hierarchies, permission matrices, and automated anti-raid gates',
           'Clean channel taxonomy, custom banner art, and onboarding flows',
@@ -173,6 +176,7 @@ export default function BentoSection() {
         tools: ['Next.js 16', 'TypeScript', 'discord.js', 'discord.py', 'Redis'],
         metrics: 'Pinned GitHub Repo · 100% Lighthouse Score',
         previewUrl: '/og-image.webp',
+        gallery: PROJECTS[2].gallery,
         details: [
           'Production Discord bots with custom slash commands and state machine moderation',
           'High performance Next.js web applications with minimal, zero-slop architecture',
