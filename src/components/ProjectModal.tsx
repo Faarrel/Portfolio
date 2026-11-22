@@ -69,6 +69,12 @@ const getVideoSource = (url: string): string => {
 export default function ProjectModal({ item, onClose }: ProjectModalProps) {
   const [activeLightboxIndex, setActiveLightboxIndex] = useState<number | null>(null);
 
+  const galleryList = item?.gallery && item.gallery.length > 0
+    ? item.gallery
+    : item?.previewUrl
+    ? [item.previewUrl]
+    : [];
+
   // Keyboard navigation & lock body scroll
   useEffect(() => {
     if (!item) return;
@@ -80,14 +86,14 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
         } else {
           onClose();
         }
-      } else if (activeLightboxIndex !== null && item.gallery && item.gallery.length > 1) {
+      } else if (activeLightboxIndex !== null && galleryList.length > 1) {
         if (e.key === 'ArrowLeft') {
           setActiveLightboxIndex((prev) =>
-            prev === null ? 0 : (prev - 1 + item.gallery!.length) % item.gallery!.length
+            prev === null ? 0 : (prev - 1 + galleryList.length) % galleryList.length
           );
         } else if (e.key === 'ArrowRight') {
           setActiveLightboxIndex((prev) =>
-            prev === null ? 0 : (prev + 1) % item.gallery!.length
+            prev === null ? 0 : (prev + 1) % galleryList.length
           );
         }
       }
@@ -101,7 +107,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
       document.body.style.overflow = originalOverflow;
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [item, onClose, activeLightboxIndex]);
+  }, [item, onClose, activeLightboxIndex, galleryList.length]);
 
   return (
     <AnimatePresence>
@@ -265,10 +271,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
               ) : item.previewUrl ? (
                 <button
                   type="button"
-                  onClick={() => {
-                    item.gallery = [item.previewUrl!];
-                    setActiveLightboxIndex(0);
-                  }}
+                  onClick={() => setActiveLightboxIndex(0)}
                   className="relative w-full rounded-xl overflow-hidden bg-black/50 border border-white/10 aspect-video sm:aspect-[16/9] flex items-center justify-center group cursor-pointer hover:border-white/30 transition-all"
                 >
                   {isMediaVideo(item.previewUrl) ? (
@@ -419,7 +422,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
 
           {/* Discord-Style Fullscreen Lightbox Preview (Photo 2) */}
           <AnimatePresence>
-            {activeLightboxIndex !== null && item.gallery && (
+            {activeLightboxIndex !== null && galleryList.length > 0 && (
               <div className="fixed inset-0 z-[120] flex flex-col justify-between p-3 sm:p-6 overflow-hidden select-none">
                 {/* Backdrop */}
                 <motion.div
@@ -434,7 +437,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                 <div className="relative z-10 flex items-center justify-between w-full max-w-6xl mx-auto py-2 px-1">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-mono font-medium text-zinc-400 bg-white/10 px-2.5 py-1 rounded-md">
-                      {activeLightboxIndex + 1} / {item.gallery.length}
+                      {activeLightboxIndex + 1} / {galleryList.length}
                     </span>
                     <span className="hidden sm:inline-block text-xs font-semibold text-zinc-300 truncate max-w-xs">
                       {item.title}
@@ -454,12 +457,12 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                 {/* Center Image Display with Arrow Controls */}
                 <div className="relative z-10 flex-1 flex items-center justify-center min-h-0 my-auto px-2 sm:px-12">
                   {/* Previous Button */}
-                  {item.gallery.length > 1 && (
+                  {galleryList.length > 1 && (
                     <button
                       type="button"
                       onClick={() =>
                         setActiveLightboxIndex((prev) =>
-                          prev === null ? 0 : (prev - 1 + item.gallery!.length) % item.gallery!.length
+                          prev === null ? 0 : (prev - 1 + galleryList.length) % galleryList.length
                         )
                       }
                       aria-label="Previous image"
@@ -478,10 +481,10 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                     transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
                     className="relative max-w-full max-h-[66vh] sm:max-h-[72vh] flex items-center justify-center"
                   >
-                    {isMediaVideo(item.gallery[activeLightboxIndex]) ? (
+                    {isMediaVideo(galleryList[activeLightboxIndex]) ? (
                       <video
-                        src={getVideoSource(item.gallery[activeLightboxIndex])}
-                        poster={getVideoPoster(item.gallery[activeLightboxIndex])}
+                        src={getVideoSource(galleryList[activeLightboxIndex])}
+                        poster={getVideoPoster(galleryList[activeLightboxIndex])}
                         autoPlay
                         loop
                         controls
@@ -491,7 +494,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                     ) : (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
-                        src={item.gallery[activeLightboxIndex].replace('t_delivery_thumb,', '')}
+                        src={galleryList[activeLightboxIndex].replace('t_delivery_thumb,', '')}
                         alt={`${item.title} enlarged ${activeLightboxIndex + 1}`}
                         className="max-w-full max-h-[66vh] sm:max-h-[72vh] object-contain rounded-xl border border-white/15 shadow-2xl bg-black/60"
                       />
@@ -499,12 +502,12 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                   </motion.div>
 
                   {/* Next Button */}
-                  {item.gallery.length > 1 && (
+                  {galleryList.length > 1 && (
                     <button
                       type="button"
                       onClick={() =>
                         setActiveLightboxIndex((prev) =>
-                          prev === null ? 0 : (prev + 1) % item.gallery!.length
+                          prev === null ? 0 : (prev + 1) % galleryList.length
                         )
                       }
                       aria-label="Next image"
@@ -516,10 +519,10 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                 </div>
 
                 {/* Bottom Discord-Style Thumbnail Strip (Photo 2) */}
-                {item.gallery.length > 1 && (
+                {galleryList.length > 1 && (
                   <div className="relative z-10 w-full max-w-xl mx-auto pt-2 pb-1 flex justify-center">
                     <div className="flex items-center gap-2 px-3 py-2 bg-[#121214]/90 border border-white/10 rounded-2xl backdrop-blur-md max-w-full overflow-x-auto shadow-2xl">
-                      {item.gallery.map((thumbUrl, idx) => {
+                      {galleryList.map((thumbUrl, idx) => {
                         const isActive = idx === activeLightboxIndex;
                         const poster = isMediaVideo(thumbUrl) ? getVideoPoster(thumbUrl) : thumbUrl;
                         return (
