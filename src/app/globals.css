@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Planet Kosmos';
+  src: url('/fonts/planet-kosmos.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-planet-kosmos {
+  font-family: 'Planet Kosmos', sans-serif !important;
+}
+
+@theme {
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  --background: #121212;
+  --foreground: #E0E0E0;
+  --card: #161618;
+  --card-foreground: #F4F4F5;
+  --popover: #161618;
+  --popover-foreground: #F4F4F5;
+  --primary: #FFFFFF;
+  --primary-foreground: #121212;
+  --secondary: #1F1F23;
+  --secondary-foreground: #F4F4F5;
+  --muted: #27272A;
+  --muted-foreground: #A1A1AA;
+  --accent: #27272A;
+  --accent-foreground: #FFFFFF;
+  --destructive: #EF4444;
+  --destructive-foreground: #F8FAFC;
+  --border: #27272A;
+  --input: #27272A;
+  --ring: #52525B;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+/* Hide scrollbars completely while keeping full scrollability */
+html, body {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+  width: 0px;
+  height: 0px;
+  background: transparent;
+}
+
+/* Hero Title Centered Letter Spacing Stretch Effect (from FARREL PORTFOLIO reference) */
+.hero-title-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.hero-title-wrapper {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.hero-title {
+  display: inline-block !important;
+  letter-spacing: -0.065em !important;
+  transform-origin: 50% 50% !important;
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  transition: letter-spacing 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  cursor: pointer !important;
+}
+
+.hero-title:hover {
+  letter-spacing: -0.035em !important;
+}
