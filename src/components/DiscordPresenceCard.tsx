@@ -31,7 +31,14 @@ interface LanyardData {
     username: string;
     avatar: string | null;
     discriminator: string;
-    global_name?: string;
+    global_name?: string | null;
+    display_name?: string | null;
+    primary_guild?: {
+      badge: string;
+      identity_enabled: boolean;
+      identity_guild_id: string;
+      tag: string;
+    } | null;
     avatar_decoration_data?: {
       asset: string;
       sku_id: string;
@@ -67,9 +74,9 @@ function formatElapsed(startTimestamp: number) {
   const seconds = totalSeconds % 60;
 
   if (hours > 0) {
-    return `${hours}h ${minutes}m elapsed`;
+    return `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   }
-  return `${minutes}m ${seconds < 10 ? '0' : ''}${seconds}s elapsed`;
+  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
 
 function getAssetUrl(appId?: string, asset?: string) {
@@ -108,7 +115,7 @@ export default function DiscordPresenceCard() {
     }
 
     fetchLanyard();
-    const interval = setInterval(fetchLanyard, 10000);
+    const interval = setInterval(fetchLanyard, 8000);
 
     return () => {
       isMounted = false;
@@ -122,23 +129,28 @@ export default function DiscordPresenceCard() {
     const { start, end } = lanyard.spotify.timestamps;
     const total = end - start;
 
-    const timer = setInterval(() => {
+    const updateTicker = () => {
       const now = Date.now();
       const current = Math.min(Math.max(now - start, 0), total);
       setSpotifyCurrentMs(current);
-    }, 1000);
+    };
+
+    updateTicker();
+    const timer = setInterval(updateTicker, 1000);
 
     return () => clearInterval(timer);
   }, [lanyard?.spotify]);
 
   // Non-custom activity elapsed stopwatch ticker
-  const nonCustomActivity = lanyard?.activities?.find((a) => a.type !== 4);
+  const nonCustomActivities = lanyard?.activities?.filter((a) => a.type !== 4) || [];
+  const primaryActivity = nonCustomActivities[0];
+
   useEffect(() => {
-    if (!nonCustomActivity?.timestamps?.start) {
+    if (!primaryActivity?.timestamps?.start) {
       setActivityElapsed('');
       return;
     }
-    const start = nonCustomActivity.timestamps.start;
+    const start = primaryActivity.timestamps.start;
     setActivityElapsed(formatElapsed(start));
 
     const timer = setInterval(() => {
@@ -146,7 +158,7 @@ export default function DiscordPresenceCard() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [nonCustomActivity?.timestamps?.start]);
+  }, [primaryActivity?.timestamps?.start]);
 
   const status = lanyard?.discord_status || 'offline';
 
@@ -170,8 +182,9 @@ export default function DiscordPresenceCard() {
     ? `https://cdn.discordapp.com/avatar-decoration-presets/${lanyard.discord_user.avatar_decoration_data.asset}.png`
     : null;
 
-  const activityImageUrl = nonCustomActivity
-    ? getAssetUrl(nonCustomActivity.application_id, nonCustomActivity.assets?.large_image)
+  const clan = lanyard?.discord_user?.primary_guild;
+  const clanBadgeUrl = clan?.badge && clan?.identity_guild_id
+    ? `https://cdn.discordapp.com/clan-badges/${clan.identity_guild_id}/${clan.badge}.png`
     : null;
 
   const handleCopyUsername = () => {
@@ -185,7 +198,7 @@ export default function DiscordPresenceCard() {
 
   return (
     <div className="rounded-2xl overflow-hidden bg-[#202024] border border-[#27272a] p-4 sm:p-5 flex flex-col justify-between gap-4">
-      {/* Header: Avatar, Name, Handle, Status */}
+      {/* Header: Avatar, Name, Handle, Clan Tag, Status */}
       <div className="flex items-center gap-3.5 min-w-0">
         <div className="relative shrink-0">
           <img
@@ -211,9 +224,9 @@ export default function DiscordPresenceCard() {
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm sm:text-base font-bold text-white truncate">
-              {lanyard?.discord_user?.global_name || PERSONAL_INFO.name}
+              {lanyard?.discord_user?.global_name || lanyard?.discord_user?.display_name || PERSONAL_INFO.name}
             </span>
             <button
               onClick={handleCopyUsername}
@@ -222,6 +235,16 @@ export default function DiscordPresenceCard() {
             >
               @{PERSONAL_INFO.discordHandle} {copied && <span className="text-emerald-400 font-sans text-[10px]">(copied!)</span>}
             </button>
+
+            {/* Clan / Guild Tag */}
+            {clan?.tag && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-zinc-200 bg-[#2a2a30] border border-white/5 px-1.5 py-0.5 rounded-md">
+                {clanBadgeUrl && (
+                  <img src={clanBadgeUrl} alt={clan.tag} className="size-3 object-contain shrink-0" />
+                )}
+                <span>{clan.tag}</span>
+              </span>
+            )}
           </div>
 
           <div className="flex items-center gap-2 mt-0.5 text-[11px] sm:text-xs">
@@ -249,105 +272,114 @@ export default function DiscordPresenceCard() {
         </div>
       </div>
 
-      {/* Body: Real-time Spotify Player / Active Rich Presence / Minimal Standby */}
-      {spotify ? (
-        <a
-          href={`https://open.spotify.com/track/${spotify.track_id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="bg-[#18181b] hover:bg-[#1e1e24] border border-emerald-500/25 rounded-xl p-3 flex flex-col gap-2.5 transition-colors group cursor-pointer"
-        >
-          <div className="flex items-center gap-3">
-            <img
-              src={spotify.album_art_url}
-              alt={spotify.album}
-              className="size-11 sm:size-12 rounded-md object-cover shrink-0 shadow-sm"
-            />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
-                <span className="animate-pulse">Listening to Spotify</span>
-                <OpenInNewIcon className="size-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-              <p className="text-xs sm:text-sm font-semibold text-zinc-100 truncate mt-0.5">
-                {spotify.song}
-              </p>
-              <p className="text-[11px] text-zinc-400 truncate">
-                by {spotify.artist}
-              </p>
-            </div>
-            <GraphicEqIcon className="size-4 text-emerald-400 shrink-0 animate-pulse" />
-          </div>
-
-          {/* Real-time Track Progress Bar + Timer Counter */}
-          <div className="flex flex-col gap-1 pt-0.5">
-            <div className="w-full bg-zinc-800 h-1 rounded-full overflow-hidden">
-              <div
-                className="bg-emerald-500 h-full transition-all duration-1000 ease-linear rounded-full"
-                style={{ width: `${spotifyProgressPercent}%` }}
+      {/* Activities Container: Render Active App AND Spotify if both present */}
+      <div className="flex flex-col gap-2.5">
+        {/* 1. Playing / Working in App (e.g. Orca / VS Code / Games) */}
+        {primaryActivity && (
+          <div className="bg-[#18181b] border border-[#2e2e36] rounded-xl p-3 flex items-center gap-3">
+            {getAssetUrl(primaryActivity.application_id, primaryActivity.assets?.large_image) ? (
+              <img
+                src={getAssetUrl(primaryActivity.application_id, primaryActivity.assets?.large_image)!}
+                alt={primaryActivity.name}
+                className="size-11 rounded-lg object-cover bg-[#2a2a30] shrink-0 border border-white/5"
+                onError={(e) => {
+                  (e.target as HTMLElement).style.display = 'none';
+                }}
               />
-            </div>
-            <div className="flex justify-between text-[10px] font-mono text-zinc-400">
-              <span>{formatTime(spotifyCurrentMs)}</span>
-              <span>{formatTime(spotifyTotalMs)}</span>
-            </div>
-          </div>
-        </a>
-      ) : nonCustomActivity ? (
-        <div className="bg-[#18181b] border border-[#2e2e36] rounded-xl p-3 flex items-center gap-3">
-          {activityImageUrl ? (
-            <img
-              src={activityImageUrl}
-              alt={nonCustomActivity.name}
-              className="size-11 rounded-lg object-cover bg-[#2a2a30] shrink-0 border border-white/5"
-              onError={(e) => {
-                (e.target as HTMLElement).style.display = 'none';
-              }}
-            />
-          ) : (
-            <div className="size-11 rounded-lg bg-[#2a2a30] border border-white/5 flex items-center justify-center shrink-0 text-xs font-bold text-zinc-300">
-              APP
-            </div>
-          )}
+            ) : (
+              <div className="size-11 rounded-lg bg-[#2a2a30] border border-white/5 flex items-center justify-center shrink-0 text-xs font-bold text-zinc-300">
+                APP
+              </div>
+            )}
 
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider truncate">
-                {nonCustomActivity.name}
-              </span>
-              {activityElapsed && (
-                <span className="text-[10px] font-mono text-zinc-400 shrink-0">
-                  {activityElapsed}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider truncate">
+                  Playing {primaryActivity.name}
                 </span>
+                {activityElapsed && (
+                  <span className="text-[10px] font-mono text-emerald-400 font-semibold shrink-0">
+                    ⏱ {activityElapsed}
+                  </span>
+                )}
+              </div>
+
+              {primaryActivity.details && (
+                <p className="text-xs sm:text-sm font-semibold text-zinc-100 truncate mt-0.5">
+                  {primaryActivity.details}
+                </p>
+              )}
+              {primaryActivity.state && (
+                <p className="text-[11px] text-zinc-400 truncate">
+                  {primaryActivity.state}
+                </p>
+              )}
+              {!primaryActivity.details && !primaryActivity.state && (
+                <p className="text-xs font-semibold text-zinc-200 truncate mt-0.5">
+                  Active in {primaryActivity.name}
+                </p>
               )}
             </div>
-
-            {nonCustomActivity.details && (
-              <p className="text-xs font-semibold text-zinc-100 truncate mt-0.5">
-                {nonCustomActivity.details}
-              </p>
-            )}
-            {nonCustomActivity.state && (
-              <p className="text-[11px] text-zinc-400 truncate">
-                {nonCustomActivity.state}
-              </p>
-            )}
-            {!nonCustomActivity.details && !nonCustomActivity.state && (
-              <p className="text-xs font-semibold text-zinc-200 truncate mt-0.5">
-                Playing / Using {nonCustomActivity.name}
-              </p>
-            )}
           </div>
-        </div>
-      ) : (
-        <div className="bg-[#18181b] border border-[#27272a]/60 rounded-xl p-3 flex items-center justify-between text-xs text-zinc-400">
-          <span className="font-medium text-zinc-300">
-            {customStatusText || 'Currently idle & creating'}
-          </span>
-          <span className="text-[11px] text-zinc-500 font-mono">
-            ID: {DISCORD_USER_ID.slice(0, 6)}...
-          </span>
-        </div>
-      )}
+        )}
+
+        {/* 2. Listening to Spotify Player */}
+        {spotify && (
+          <a
+            href={`https://open.spotify.com/track/${spotify.track_id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-[#18181b] hover:bg-[#1e1e24] border border-emerald-500/25 rounded-xl p-3 flex flex-col gap-2.5 transition-colors group cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <img
+                src={spotify.album_art_url}
+                alt={spotify.album}
+                className="size-11 sm:size-12 rounded-md object-cover shrink-0 shadow-sm"
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
+                  <span className="animate-pulse">Listening to Spotify</span>
+                  <OpenInNewIcon className="size-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <p className="text-xs sm:text-sm font-semibold text-zinc-100 truncate mt-0.5">
+                  {spotify.song}
+                </p>
+                <p className="text-[11px] text-zinc-400 truncate">
+                  {spotify.artist}
+                </p>
+              </div>
+              <GraphicEqIcon className="size-4 text-emerald-400 shrink-0 animate-pulse" />
+            </div>
+
+            {/* Real-time Track Progress Bar + Timer Counter */}
+            <div className="flex flex-col gap-1 pt-0.5">
+              <div className="w-full bg-zinc-800 h-1 rounded-full overflow-hidden">
+                <div
+                  className="bg-emerald-500 h-full transition-all duration-1000 ease-linear rounded-full"
+                  style={{ width: `${spotifyProgressPercent}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-[10px] font-mono text-zinc-400">
+                <span>{formatTime(spotifyCurrentMs)}</span>
+                <span>{formatTime(spotifyTotalMs)}</span>
+              </div>
+            </div>
+          </a>
+        )}
+
+        {/* 3. Fallback when neither activity nor spotify is active */}
+        {!primaryActivity && !spotify && (
+          <div className="bg-[#18181b] border border-[#27272a]/60 rounded-xl p-3 flex items-center justify-between text-xs text-zinc-400">
+            <span className="font-medium text-zinc-300">
+              {customStatusText || 'Currently idle & creating'}
+            </span>
+            <span className="text-[11px] text-zinc-500 font-mono">
+              ID: {DISCORD_USER_ID.slice(0, 6)}...
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
