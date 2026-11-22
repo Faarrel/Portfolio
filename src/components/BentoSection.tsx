@@ -19,22 +19,28 @@ import {
 import { PERSONAL_INFO, PROJECTS } from '@/data/portfolioData';
 import DiscordPresenceCard from '@/components/DiscordPresenceCard';
 
-// 1:1 Exact Geometric & Organic Vector Masks from Shape Reference Catalog (Non-clipping, wide interior)
+// Clean Geometric Shapes from Reference (100% regular, non-abstract, non-clipping)
 const CUSTOM_MASKS = {
-  // 1. 4-Sided Cookie (Row 4, Col 2 in reference) - Card 1: i'm faarrel
-  cookie4: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none'%3E%3Cpath fill='currentColor' d='M 50,5 C 65,5 80,0 90,10 C 100,20 95,35 95,50 C 95,65 100,80 90,90 C 80,100 65,95 50,95 C 35,95 20,100 10,90 C 0,80 5,65 5,50 C 5,35 0,20 10,10 C 20,0 35,5 50,5 Z'/%3E%3C/svg%3E")`,
+  // Shape 4: 4-Leaf Symmetrical Clover / Rounded Cross (uploaded_media_4)
+  clover4: `url('/shapes/shape-4.png')`,
 
-  // 2. 8-Leaf Clover / Rosette (Row 5, Col 3 in reference) - Card 2: what i've made
-  clover8: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none'%3E%3Cpath fill='currentColor' d='M 98,50 C 98,56.8 87.2,59.6 85.1,64.5 C 83.1,69.5 88.7,79.1 83.9,83.9 C 79.1,88.7 69.5,83.1 64.5,85.1 C 59.6,87.2 56.8,98 50,98 C 43.2,98 40.4,87.2 35.5,85.1 C 30.5,83.1 20.9,88.7 16.1,83.9 C 11.3,79.1 16.9,69.5 14.9,64.5 C 12.8,59.6 2,56.8 2,50 C 2,43.2 12.8,40.4 14.9,35.5 C 16.9,30.5 11.3,20.9 16.1,16.1 C 20.9,11.3 30.5,16.9 35.5,14.9 C 40.4,12.8 43.2,2 50,2 C 56.8,2 59.6,12.8 64.5,14.9 C 69.5,16.9 79.1,11.3 83.9,16.1 C 88.7,20.9 83.1,30.5 85.1,35.5 C 87.2,40.4 98,43.2 98,50 Z'/%3E%3C/svg%3E")`,
+  // Shape 2: Rounded Pentagon (uploaded_media_2)
+  pentagon: `url('/shapes/shape-2.png')`,
 
-  // 3. Gem (Row 3, Col 4 in reference) - Card 3: where to find me
-  gem: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none'%3E%3Cpath fill='currentColor' d='M 30,8 L 70,8 Q 84,8 90,20 L 96,38 Q 98,46 94,54 L 84,82 Q 80,92 68,92 L 32,92 Q 20,92 16,82 L 6,54 Q 2,46 4,38 L 10,20 Q 16,8 30,8 Z'/%3E%3C/svg%3E")`,
+  // Shape 3: 8-Pointed Star / Scallop Badge (uploaded_media_3)
+  star8: `url('/shapes/shape-3.png')`,
 
-  // 4. Pill / Tilted Pebble (Row 2, Col 2 in reference) - Card 4: selected highlights
-  pill: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none'%3E%3Cpath fill='currentColor' d='M 36,8 C 58,-1 80,6 91,24 C 102,42 98,68 84,85 C 70,100 42,98 25,86 C 8,72 0,48 8,30 C 14,16 23,10 36,8 Z'/%3E%3C/svg%3E")`,
+  // Shape 5: 12-Lobed Cluster Rosette (uploaded_media_5)
+  rosette12: `url('/shapes/shape-5.png')`,
 
-  // 5. Bloated Organic Badge (Wide interior, zero clipping) - Card: live status
-  organicBadge: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none'%3E%3Cpath fill='currentColor' d='M 50,6 C 66,6 80,4 88,14 C 98,24 94,38 94,50 C 94,62 98,76 88,86 C 78,96 66,94 50,94 C 34,94 22,96 12,86 C 2,76 6,62 6,50 C 6,38 2,24 12,14 C 20,4 34,6 50,6 Z'/%3E%3C/svg%3E")`,
+  // Shape 0: Slanted Squircle (uploaded_media_0)
+  slantedSquircle: `url('/shapes/shape-0.png')`,
+
+  // Shape 1: Tilted Smooth Oval (uploaded_media_1)
+  tiltedOval: `url('/shapes/shape-1.png')`,
+
+  // Shape 6: Pixel Circle (uploaded_media_6)
+  pixelCircle: `url('/shapes/shape-6.png')`,
 };
 
 function OrganicIconBadge({
@@ -42,7 +48,7 @@ function OrganicIconBadge({
   bg = 'bg-white',
   textColor = 'text-zinc-950',
   children,
-  className = 'size-9 sm:size-10',
+  className = 'size-12 mb-3.5 sm:mb-4',
 }: {
   mask: string;
   bg?: string;
@@ -52,7 +58,7 @@ function OrganicIconBadge({
 }) {
   return (
     <div
-      className={`inline-flex items-center justify-center p-2 shrink-0 ${bg} ${textColor} ${className}`}
+      className={`inline-flex items-center justify-center p-2.5 shrink-0 ${bg} ${textColor} ${className}`}
       style={{
         WebkitMaskImage: mask,
         maskImage: mask,
@@ -150,30 +156,32 @@ export default function BentoSection() {
               />
 
               <div className="relative z-10 max-w-[58%] sm:max-w-[62%]">
-                {/* Title & Badge Row */}
-                <div className="flex items-center gap-3 mb-3 sm:mb-4">
-                  <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+                {/* Top Icon Badge (4-Petal Flower - Theme White) */}
+                <OrganicIconBadge mask={CUSTOM_MASKS.clover4} bg="bg-white" textColor="text-zinc-950">
+                  <AutoAwesomeIcon className="size-5" />
+                </OrganicIconBadge>
+
+                {/* Title & Professional Profile Capabilities */}
+                <div>
+                  <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-3 sm:mb-4">
                     i&apos;m <span className="font-planet-kosmos text-2xl sm:text-3xl font-normal tracking-wide text-white" style={{ fontFamily: "'Planet Kosmos', sans-serif" }}>faarrel</span>
                   </h3>
-                  <OrganicIconBadge mask={CUSTOM_MASKS.cookie4} bg="bg-white" textColor="text-zinc-950" className="size-8 sm:size-9">
-                    <AutoAwesomeIcon className="size-4" />
-                  </OrganicIconBadge>
-                </div>
 
-                <ul className="space-y-2 sm:space-y-2.5 text-xs sm:text-sm text-zinc-300 font-medium">
-                  <li className="flex items-start gap-2.5 leading-relaxed">
-                    <span className="size-1.5 rounded-full bg-zinc-400 shrink-0 mt-2" />
-                    <span>Computer Science graduate operating at the intersection of design &amp; code</span>
-                  </li>
-                  <li className="flex items-start gap-2.5 leading-relaxed">
-                    <span className="size-1.5 rounded-full bg-zinc-400 shrink-0 mt-2" />
-                    <span>Specializing in 2D character puppet animation &amp; motion design (After Effects)</span>
-                  </li>
-                  <li className="flex items-start gap-2.5 leading-relaxed">
-                    <span className="size-1.5 rounded-full bg-zinc-400 shrink-0 mt-2" />
-                    <span>Engineering secure Discord server architecture &amp; fullstack web applications</span>
-                  </li>
-                </ul>
+                  <ul className="space-y-2 sm:space-y-2.5 text-xs sm:text-sm text-zinc-300 font-medium">
+                    <li className="flex items-start gap-2.5 leading-relaxed">
+                      <span className="size-1.5 rounded-full bg-zinc-400 shrink-0 mt-2" />
+                      <span>Computer Science graduate operating at the intersection of design &amp; code</span>
+                    </li>
+                    <li className="flex items-start gap-2.5 leading-relaxed">
+                      <span className="size-1.5 rounded-full bg-zinc-400 shrink-0 mt-2" />
+                      <span>Specializing in 2D character puppet animation &amp; motion design (After Effects)</span>
+                    </li>
+                    <li className="flex items-start gap-2.5 leading-relaxed">
+                      <span className="size-1.5 rounded-full bg-zinc-400 shrink-0 mt-2" />
+                      <span>Engineering secure Discord server architecture &amp; fullstack web applications</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
 
               {/* Right-Center Aligned 3D Logo */}
@@ -193,15 +201,15 @@ export default function BentoSection() {
               className="order-2 lg:order-none w-full bg-[#161618]/95 border border-[#27272a] rounded-[28px] p-5 sm:p-7 md:p-8 flex flex-col justify-between shadow-sm"
             >
               <div>
-                {/* Header Row: Title on Left, Organic Badge on Right */}
-                <div className="flex items-center justify-between gap-3 mb-4 sm:mb-5">
-                  <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-                    live status
-                  </h3>
-                  <OrganicIconBadge mask={CUSTOM_MASKS.organicBadge} bg="bg-[#2a2a30]" textColor="text-white">
-                    <DiscordIcon className="size-4 sm:size-5" />
-                  </OrganicIconBadge>
-                </div>
+                {/* Top Icon Badge (Rounded Pentagon - Theme Graphite) */}
+                <OrganicIconBadge mask={CUSTOM_MASKS.pentagon} bg="bg-[#2a2a30]" textColor="text-white">
+                  <DiscordIcon className="size-5" />
+                </OrganicIconBadge>
+
+                {/* Title */}
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-4 sm:mb-5">
+                  live status
+                </h3>
 
                 {/* Live Discord Status Widget */}
                 <DiscordPresenceCard />
@@ -217,15 +225,15 @@ export default function BentoSection() {
               className="order-5 lg:order-none w-full bg-[#161618]/95 border border-[#27272a] rounded-[28px] p-5 sm:p-7 md:p-8 flex flex-col justify-between shadow-sm"
             >
               <div>
-                {/* Header Row: Title on Left, Organic Badge on Right */}
-                <div className="flex items-center justify-between gap-3 mb-4 sm:mb-5">
-                  <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-                    where to find me
-                  </h3>
-                  <OrganicIconBadge mask={CUSTOM_MASKS.gem} bg="bg-white" textColor="text-zinc-950">
-                    <LinkIcon className="size-4 sm:size-5" />
-                  </OrganicIconBadge>
-                </div>
+                {/* Top Icon Badge (8-Pointed Star - Theme White) */}
+                <OrganicIconBadge mask={CUSTOM_MASKS.star8} bg="bg-white" textColor="text-zinc-950">
+                  <LinkIcon className="size-5" />
+                </OrganicIconBadge>
+
+                {/* Title */}
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-4 sm:mb-5">
+                  where to find me
+                </h3>
 
                 {/* Segmented Button Stack */}
                 <div className="rounded-2xl overflow-hidden flex flex-col gap-[2px] bg-[#27272a]/30">
@@ -274,15 +282,15 @@ export default function BentoSection() {
               className="order-3 lg:order-none w-full bg-[#161618]/95 border border-[#27272a] rounded-[28px] p-5 sm:p-7 md:p-8 flex flex-col justify-between shadow-sm"
             >
               <div>
-                {/* Header Row: Title on Left, Organic Badge on Right */}
-                <div className="flex items-center justify-between gap-3 mb-4 sm:mb-5">
-                  <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-                    what i&apos;ve made
-                  </h3>
-                  <OrganicIconBadge mask={CUSTOM_MASKS.clover8} bg="bg-[#2a2a30]" textColor="text-white">
-                    <LayersIcon className="size-4 sm:size-5" />
-                  </OrganicIconBadge>
-                </div>
+                {/* Top Icon Badge (12-Lobed Cluster Rosette - Theme Graphite) */}
+                <OrganicIconBadge mask={CUSTOM_MASKS.rosette12} bg="bg-[#2a2a30]" textColor="text-white">
+                  <LayersIcon className="size-5" />
+                </OrganicIconBadge>
+
+                {/* Title */}
+                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-4 sm:mb-5">
+                  what i&apos;ve made
+                </h3>
 
                 {/* Segmented Button Stack */}
                 <div className="rounded-2xl overflow-hidden flex flex-col gap-[2px] bg-[#27272a]/30">
@@ -326,15 +334,15 @@ export default function BentoSection() {
               className="order-4 lg:order-none w-full bg-[#161618]/95 border border-[#27272a] rounded-[28px] p-5 sm:p-7 md:p-8 flex flex-col justify-between shadow-sm group"
             >
             <div>
-              {/* Header Row: Title on Left, Organic Badge on Right */}
-              <div className="flex items-center justify-between gap-3 mb-4 sm:mb-5">
-                <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-                  selected highlights
-                </h3>
-                <OrganicIconBadge mask={CUSTOM_MASKS.pill} bg="bg-white" textColor="text-zinc-950">
-                  <GraphicEqIcon className="size-4 sm:size-5" />
-                </OrganicIconBadge>
-              </div>
+              {/* Top Icon Badge (Slanted Squircle - Theme White) */}
+              <OrganicIconBadge mask={CUSTOM_MASKS.slantedSquircle} bg="bg-white" textColor="text-zinc-950">
+                <GraphicEqIcon className="size-5" />
+              </OrganicIconBadge>
+
+              {/* Title */}
+              <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-4 sm:mb-5">
+                selected highlights
+              </h3>
 
               {/* Featured Showcase Item (Integrated Flow, No Nested Card Frame) */}
               <div className="pb-4 sm:pb-5 mb-4 border-b border-white/[0.08]">
