@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { OpenInNewIcon, GraphicEqIcon } from '@/components/ui/material-symbols';
+import { GraphicEqIcon } from '@/components/ui/material-symbols';
 import { PERSONAL_INFO } from '@/data/portfolioData';
 
 interface LanyardActivity {
@@ -402,7 +402,7 @@ export default function DiscordPresenceCard() {
               href={`https://open.spotify.com/track/${spotify.track_id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-xl p-2.5 -mx-2.5 hover:bg-white/[0.04] flex flex-col gap-2 transition-colors group cursor-pointer"
+              className="flex flex-col gap-2"
             >
               <div className="flex items-center gap-3">
                 <img
@@ -413,7 +413,6 @@ export default function DiscordPresenceCard() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-300 uppercase tracking-wider">
                     <span>Listening to Spotify</span>
-                    <OpenInNewIcon className="size-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400" />
                   </div>
                   <p className="text-xs sm:text-sm font-semibold text-zinc-100 truncate mt-0.5">
                     {spotify.song}
