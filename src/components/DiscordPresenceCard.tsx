@@ -53,6 +53,34 @@ interface LanyardData {
 
 const DISCORD_USER_ID = '938045579215380510';
 
+const DISCORD_BADGES = [
+  {
+    name: 'Gifting Legend',
+    desc: 'Gifting Legend. 100 gifts given',
+    src: '/badges/gifting-legend.png',
+  },
+  {
+    name: 'Game Time Eternal',
+    desc: 'Game Time Eternal. 5,881 hours of games played',
+    src: '/badges/game-time-eternal.png',
+  },
+  {
+    name: 'Nitro Emerald',
+    desc: 'Nitro Emerald. Subscriber since 5/17/23',
+    src: '/badges/nitro-emerald.png',
+  },
+  {
+    name: 'Game Variety Universalist',
+    desc: 'Game Variety Universalist. 197 games played',
+    src: '/badges/game-variety-universalist.png',
+  },
+  {
+    name: 'Server Boosting',
+    desc: 'Server Boosting. Boosting since 11/10/23',
+    src: '/badges/server-booster-exact.png',
+  },
+];
+
 function formatTime(ms: number) {
   const totalSeconds = Math.max(0, Math.floor(ms / 1000));
   const m = Math.floor(totalSeconds / 60);
@@ -180,7 +208,7 @@ export default function DiscordPresenceCard() {
     ? `https://cdn.discordapp.com/avatars/${DISCORD_USER_ID}/${lanyard.discord_user.avatar}.png?size=128`
     : 'https://cdn.discordapp.com/avatars/938045579215380510/7395402e2522fb277f4577f23d0bffc0.webp?size=160';
 
-  const decorationAsset = lanyard?.discord_user?.avatar_decoration_data?.asset || 'a_838e8568d3798c688a05c696ec6bed5f';
+  const decorationAsset = lanyard?.discord_user?.avatar_decoration_data?.asset;
   const avatarDecorationUrl = decorationAsset
     ? `https://cdn.discordapp.com/avatar-decoration-presets/${decorationAsset}.png?size=160&passthrough=true`
     : null;
@@ -247,31 +275,16 @@ export default function DiscordPresenceCard() {
             </button>
 
             {/* Official Discord Profile Badges */}
-            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#18181b] border border-white/5 shrink-0">
-              <img
-                src="/badges/nitro.png"
-                alt="Discord Nitro"
-                title="Discord Nitro Subscriber"
-                className="size-4 object-contain"
-              />
-              <img
-                src="/badges/boost_2_months.png"
-                alt="Server Booster"
-                title="Server Booster"
-                className="size-4 object-contain"
-              />
-              <img
-                src="/badges/active_developer.png"
-                alt="Active Developer"
-                title="Active Developer"
-                className="size-4 object-contain"
-              />
-              <img
-                src="/badges/complete_a_quest.png"
-                alt="Completed a Quest"
-                title="Completed a Quest"
-                className="size-4 object-contain"
-              />
+            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#18181b] border border-white/5 shrink-0">
+              {DISCORD_BADGES.map((b) => (
+                <img
+                  key={b.name}
+                  src={b.src}
+                  alt={b.name}
+                  title={b.desc}
+                  className="size-4 sm:size-4.5 object-contain hover:scale-110 transition-transform"
+                />
+              ))}
             </div>
           </div>
 
