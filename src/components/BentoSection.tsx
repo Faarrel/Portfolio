@@ -17,7 +17,7 @@ import {
   InstagramIcon,
   FiverrIcon,
 } from '@/components/ui/material-symbols';
-import { PERSONAL_INFO, PROJECTS } from '@/data/portfolioData';
+import { PERSONAL_INFO, PROJECTS, FIVERR_LINKS } from '@/data/portfolioData';
 import DiscordPresenceCard from '@/components/DiscordPresenceCard';
 import ProjectModal, { ProjectModalItem } from '@/components/ProjectModal';
 
@@ -83,18 +83,25 @@ export default function BentoSection() {
         title: 'Graphic Design & Visual Identity',
         categoryLabel: 'Design & Visual Identity',
         description:
-          'Comprehensive graphic design, visual branding, promotional posters, and creative assets designed with Photoshop, Alight Motion, and vector styling.',
+          'Comprehensive graphic design, visual branding, promotional posters, and creative assets designed with Photoshop, Alight Motion, and vector styling. Verified through 300+ delivered orders on Fiverr.',
         role: 'Lead Visual Designer',
         year: '2024 - 2026',
         tools: ['Photoshop', 'Alight Motion', 'Illustrator', 'Figma'],
-        metrics: '50+ Delivered Client Branding Packs',
+        metrics: '300+ Delivered Orders on Fiverr · 4.9 Rating',
         details: [
           'Brand identity suites, logotypes, color palettes, and typographic hierarchies',
           'High-resolution promotional posters, stream overlays, and banner graphics',
           'Vector illustration and merchandise-ready graphic compositions',
           'Custom icon design and aesthetic monochrome/cyberpunk theme assets',
         ],
-        githubUrl: PERSONAL_INFO.socials.github,
+        externalUrl: FIVERR_LINKS.portfolio,
+        externalLabel: 'View on Fiverr',
+        externalType: 'fiverr' as const,
+        clientReview: {
+          author: 'minjeji0704',
+          rating: 5,
+          comment: 'Very fast work and good quality',
+        },
       },
     },
     {
@@ -105,18 +112,25 @@ export default function BentoSection() {
         title: 'Character Animation & Puppet Motion',
         categoryLabel: 'Animation & Motion Rigging',
         description:
-          'Transforming static 2D character artwork and anime illustrations into lifelike looped animations using After Effects puppet pins, mesh deformation, and physics simulations.',
+          'Transforming static 2D character artwork and anime illustrations into lifelike looped animations using After Effects puppet pins, mesh deformation, and physics simulations. 136+ verified reviews on Fiverr.',
         role: 'Character Animator & Motion Designer',
         year: '2024 - 2026',
-        tools: ['After Effects', 'Photoshop', 'Alight Motion', 'Puppet Tool'],
-        metrics: 'Seamless 60 FPS Loops · 4K Master Exports',
+        tools: ['After Effects', 'Photoshop', 'Alight Motion', 'Puppet Pin Rigging'],
+        metrics: '136+ Reviews · 5.0 Rating · 60 FPS Master Loops',
         details: [
           'PSD asset separation: individualizing eyes, pupils, hair layers, garments, and limbs',
           'Natural eye blinks, chest breathing rhythms, and dynamic hair physics sway',
           'Ambient particle effects, atmospheric lighting, and parallax depth compositing',
           'Lightweight web-ready deliverables (MP4, WebM, transparent loops)',
         ],
-        githubUrl: PERSONAL_INFO.socials.github,
+        externalUrl: FIVERR_LINKS.animatedProfile,
+        externalLabel: 'View on Fiverr',
+        externalType: 'fiverr' as const,
+        clientReview: {
+          author: 'syndorei',
+          rating: 5,
+          comment: 'Very good work and he worked very fast. I needed a server icon gif for my discord server. I will definitely use this guy again. Very professional and delivered exactly what i needed.',
+        },
       },
     },
     {
@@ -127,7 +141,7 @@ export default function BentoSection() {
         title: 'Discord Server Architecture',
         categoryLabel: 'Community Infrastructure',
         description:
-          'Turnkey Discord guild design and infrastructure architecture for creators, gaming communities, and Web3 projects. Built for security, engagement, and automated management.',
+          'Turnkey Discord guild design and infrastructure architecture for creators, gaming communities, and Web3 projects. Built for security, engagement, and automated management. Direct collaboration on Discord.',
         role: 'Guild Architect & Security Specialist',
         year: '2023 - 2026',
         tools: ['Discord API', 'Node.js', 'Python', 'Security Bots', 'Webhook Integrations'],
@@ -138,7 +152,14 @@ export default function BentoSection() {
           'Clean channel taxonomy, custom banner art, embed announcements, and onboarding flows',
           'Integrated ticket dispatchers, mod logs, and community engagement bot routines',
         ],
-        githubUrl: PERSONAL_INFO.socials.github,
+        externalUrl: 'https://discord.com/users/938045579215380510',
+        externalLabel: 'Contact on Discord',
+        externalType: 'discord' as const,
+        clientReview: {
+          author: 'gvent7',
+          rating: 5,
+          comment: 'Absolutely incredible job, and the designer was really kind and nice. Hiring him to create my Discord server icon made me delighted! I advise hiring him to everyone! In addition, he met the deadline and is quick.',
+        },
       },
     },
     {
@@ -149,18 +170,21 @@ export default function BentoSection() {
         title: 'Fullstack Web & Discord Bot Development',
         categoryLabel: 'Engineering & Automation',
         description:
-          'Custom Discord bot development and high-performance modern web applications. Specializing in discord.js, discord.py, Next.js, TypeScript, and serverless deployments.',
+          'Custom Discord bot development and high-performance modern web applications. Specializing in discord.js, discord.py, Next.js, TypeScript, and serverless deployments. Source code on GitHub.',
         role: 'Fullstack & Bot Engineer',
         year: '2023 - 2026',
         tools: ['Next.js 16', 'TypeScript', 'discord.js', 'discord.py', 'Node.js', 'Python', 'PostgreSQL', 'Redis'],
-        metrics: 'Sub-15ms Command Latency · 99.9% Production Uptime',
+        metrics: 'Pinned GitHub Repo · 100% Lighthouse Performance',
         details: [
           'Production Discord bots with custom slash commands, modals, and event listeners',
           'State machine-driven moderation and webhook automation pipelines',
           'Next.js web applications with modern App Router, responsive design, and Tailwind CSS',
           'Robust database integration, Redis caching, and containerized deployment',
         ],
-        githubUrl: PERSONAL_INFO.socials.github,
+        githubUrl: 'https://github.com/Faarrel/Portfolio',
+        externalUrl: 'https://github.com/Faarrel/Portfolio',
+        externalLabel: 'View on GitHub',
+        externalType: 'github' as const,
       },
     },
   ];
@@ -417,12 +441,7 @@ export default function BentoSection() {
 
               {/* Featured Showcase Item (Integrated Flow, No Nested Card Frame) */}
               <div
-                onClick={() =>
-                  setActiveModalItem({
-                    ...featuredProject,
-                    githubUrl: PERSONAL_INFO.socials.github,
-                  })
-                }
+                onClick={() => setActiveModalItem(featuredProject)}
                 className="pb-4 sm:pb-5 mb-4 border-b border-white/[0.08] cursor-pointer group/featured"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-200 font-semibold mb-2.5">
@@ -431,19 +450,19 @@ export default function BentoSection() {
                     <span className="text-zinc-100 font-bold">{PERSONAL_INFO.name}</span>
                   </div>
                   <span className="text-xs uppercase tracking-wider text-zinc-100 font-semibold bg-white/5 border border-white/10 px-2.5 py-1 rounded-md">
-                    After Effects Puppet &amp; Motion
+                    {featuredProject.categoryLabel}
                   </span>
                 </div>
 
                 <div>
                   <span className="text-xs text-zinc-400 uppercase tracking-wider block font-semibold">
-                    Featured Animated Illustration
+                    Featured Animated Illustration &amp; Rig
                   </span>
                   <div className="text-base sm:text-xl font-bold text-white group-hover/featured:text-zinc-200 transition-colors mt-1">
                     {featuredProject.title}
                   </div>
                   <p className="text-xs sm:text-sm text-zinc-300 mt-2 leading-relaxed font-medium text-pretty">
-                    Static 2D character illustration brought to life in After Effects: natural blinking eyes, dynamic hair physics sway, rhythmic breathing motion, and ambient particle glow.
+                    {featuredProject.description}
                   </p>
                 </div>
 
@@ -453,50 +472,53 @@ export default function BentoSection() {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setActiveModalItem({
-                        ...featuredProject,
-                        githubUrl: PERSONAL_INFO.socials.github,
-                      });
+                      setActiveModalItem(featuredProject);
                     }}
                     className="text-white hover:text-zinc-200 font-semibold flex items-center gap-1 transition-colors text-xs cursor-pointer"
                   >
-                    Featured Work <OpenInNewIcon className="size-3.5" />
+                    View on Fiverr <OpenInNewIcon className="size-3.5" />
                   </button>
                 </div>
               </div>
 
               {/* Secondary Projects - Segmented Button Stack */}
               <div className="rounded-2xl overflow-hidden flex flex-col gap-[2px] bg-[#27272a]/30">
-                {secondaryProjects.map((p, idx) => (
-                  <motion.button
-                    key={p.id}
-                    type="button"
-                    onClick={() =>
-                      setActiveModalItem({
-                        ...p,
-                        githubUrl: PERSONAL_INFO.socials.github,
-                      })
-                    }
-                    initial={{ opacity: 0, y: 10 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.3, delay: 0.22 + idx * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                    className="w-full text-left bg-[#202024] hover:bg-[#28282e] p-3.5 sm:p-4 flex items-center justify-between gap-3.5 transition-colors group/item cursor-pointer rounded-[4px]"
-                  >
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      <MovieIcon className="size-5 text-zinc-300 group-hover/item:text-white transition-colors shrink-0" />
-                      <div className="min-w-0">
-                        <b className="block text-xs sm:text-sm font-bold text-zinc-100 group-hover/item:text-white transition-colors truncate">
-                          {p.title}
-                        </b>
-                        <span className="block text-xs text-zinc-400 font-medium group-hover/item:text-zinc-200 transition-colors truncate">
-                          {p.categoryLabel} · {p.year} ({p.role})
-                        </span>
+                {secondaryProjects.map((p, idx) => {
+                  const SecondaryIcon =
+                    p.category === 'dev'
+                      ? CodeIcon
+                      : p.category === 'motion'
+                      ? MovieIcon
+                      : p.category === 'discord'
+                      ? SmartToyIcon
+                      : AutoAwesomeIcon;
+
+                  return (
+                    <motion.button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setActiveModalItem(p)}
+                      initial={{ opacity: 0, y: 10 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.3, delay: 0.22 + idx * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                      className="w-full text-left bg-[#202024] hover:bg-[#28282e] p-3.5 sm:p-4 flex items-center justify-between gap-3.5 transition-colors group/item cursor-pointer rounded-[4px]"
+                    >
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        <SecondaryIcon className="size-5 text-zinc-300 group-hover/item:text-white transition-colors shrink-0" />
+                        <div className="min-w-0">
+                          <b className="block text-xs sm:text-sm font-bold text-zinc-100 group-hover/item:text-white transition-colors truncate">
+                            {p.title}
+                          </b>
+                          <span className="block text-xs text-zinc-400 font-medium group-hover/item:text-zinc-200 transition-colors truncate">
+                            {p.categoryLabel} · {p.year} ({p.role})
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <ChevronRightIcon className="size-4 text-zinc-500 group-hover/item:text-white transition-colors shrink-0" />
-                  </motion.button>
-                ))}
+                      <ChevronRightIcon className="size-4 text-zinc-500 group-hover/item:text-white transition-colors shrink-0" />
+                    </motion.button>
+                  );
+                })}
               </div>
             </div>
             </motion.div>

@@ -7,6 +7,8 @@ import {
   OpenInNewIcon,
   GithubIcon,
   MailIcon,
+  FiverrIcon,
+  DiscordIcon,
 } from '@/components/ui/material-symbols';
 
 export interface ProjectModalItem {
@@ -20,6 +22,14 @@ export interface ProjectModalItem {
   details?: string[];
   githubUrl?: string;
   externalUrl?: string;
+  externalLabel?: string;
+  externalType?: 'fiverr' | 'discord' | 'github' | 'external';
+  clientReview?: {
+    author: string;
+    rating: number;
+    comment: string;
+    orderType?: string;
+  };
 }
 
 interface ProjectModalProps {
@@ -144,10 +154,52 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
               </div>
             )}
 
+            {/* Verified Client Review (from Fiverr) */}
+            {item.clientReview && (
+              <div className="flex flex-col gap-2 p-4 rounded-xl bg-white/[0.03] border border-white/[0.08]">
+                <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-1.5 font-semibold text-zinc-200">
+                    <span>Verified Client Review</span>
+                    <span className="text-zinc-500">·</span>
+                    <span className="text-zinc-400">@{item.clientReview.author}</span>
+                  </div>
+                  <span className="text-amber-400 font-bold">
+                    ★ {item.clientReview.rating.toFixed(1)} / 5.0
+                  </span>
+                </div>
+                <p className="text-xs text-zinc-300 italic leading-relaxed">
+                  &ldquo;{item.clientReview.comment}&rdquo;
+                </p>
+              </div>
+            )}
+
             {/* Footer Action Buttons */}
             <div className="pt-4 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2.5">
-                {item.githubUrl && (
+                {item.externalUrl && (
+                  <a
+                    href={item.externalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white transition-colors cursor-pointer"
+                  >
+                    {item.externalType === 'fiverr' && <FiverrIcon className="size-4" />}
+                    {item.externalType === 'discord' && <DiscordIcon className="size-4" />}
+                    {item.externalType === 'github' && <GithubIcon className="size-4" />}
+                    <span>
+                      {item.externalLabel ||
+                        (item.externalType === 'fiverr'
+                          ? 'View on Fiverr'
+                          : item.externalType === 'discord'
+                          ? 'Contact on Discord'
+                          : item.externalType === 'github'
+                          ? 'View on GitHub'
+                          : 'View Project')}
+                    </span>
+                    <OpenInNewIcon className="size-3 text-zinc-400" />
+                  </a>
+                )}
+                {item.githubUrl && item.githubUrl !== item.externalUrl && (
                   <a
                     href={item.githubUrl}
                     target="_blank"
@@ -156,17 +208,6 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                   >
                     <GithubIcon className="size-4" />
                     <span>GitHub</span>
-                    <OpenInNewIcon className="size-3 text-zinc-400" />
-                  </a>
-                )}
-                {item.externalUrl && (
-                  <a
-                    href={item.externalUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white transition-colors cursor-pointer"
-                  >
-                    <span>View Project</span>
                     <OpenInNewIcon className="size-3 text-zinc-400" />
                   </a>
                 )}

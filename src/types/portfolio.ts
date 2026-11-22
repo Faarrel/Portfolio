@@ -1,5 +1,12 @@
 export type ProjectCategory = 'all' | 'rigging' | 'motion' | 'discord' | 'dev';
 
+export interface ClientReview {
+  author: string;
+  rating: number;
+  comment: string;
+  orderType?: string;
+}
+
 export interface ProjectItem {
   id: string;
   title: string;
@@ -13,5 +20,9 @@ export interface ProjectItem {
   featured?: boolean;
   liveUrl?: string;
   githubUrl?: string;
+  externalUrl?: string;
+  externalLabel?: string;
+  externalType?: 'fiverr' | 'discord' | 'github' | 'external';
+  clientReview?: ClientReview;
   details: string[];
 }
