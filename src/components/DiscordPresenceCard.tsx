@@ -197,21 +197,18 @@ export default function DiscordPresenceCard() {
   }) || [];
 
   const primaryActivity = gameOrAppActivities[0];
+  const activityStart = primaryActivity?.timestamps?.start;
 
   useEffect(() => {
-    if (!primaryActivity?.timestamps?.start) {
-      setActivityElapsed('');
-      return;
-    }
-    const start = primaryActivity.timestamps.start;
-    setActivityElapsed(formatElapsed(start));
-
+    if (!activityStart) return;
     const timer = setInterval(() => {
-      setActivityElapsed(formatElapsed(start));
+      setActivityElapsed(formatElapsed(activityStart));
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [primaryActivity?.timestamps?.start]);
+  }, [activityStart]);
+
+  const displayElapsed = activityStart ? (activityElapsed || formatElapsed(activityStart)) : '';
 
   const status = lanyard?.discord_status || 'offline';
 
@@ -370,9 +367,9 @@ export default function DiscordPresenceCard() {
                   <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider truncate">
                     Playing {primaryActivity.name}
                   </span>
-                  {activityElapsed && (
+                  {displayElapsed && (
                     <span className="text-xs font-mono text-zinc-400 font-medium shrink-0">
-                      ⏱ {activityElapsed}
+                      ⏱ {displayElapsed}
                     </span>
                   )}
                 </div>

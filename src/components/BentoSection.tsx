@@ -21,29 +21,20 @@ import DiscordPresenceCard from '@/components/DiscordPresenceCard';
 
 // Clean Geometric Shapes from Reference (100% regular, non-abstract, non-clipping)
 const CUSTOM_MASKS = {
-  // Shape 4: 4-Leaf Symmetrical Clover / Rounded Cross (uploaded_media_4)
+  // Shape 4: 4-Leaf Symmetrical Clover (Card 1: i'm faarrel)
   clover4: `url('/shapes/shape-4.png')`,
 
-  // 6-Lobed Scallop Flower (uploaded_media_1795318348921 - for live status)
+  // 6-Lobed Scallop Flower (Card 2: live status)
   scallop6: `url('/shapes/shape-live-status.png')`,
 
-  // Shape 2: Rounded Pentagon (uploaded_media_2)
-  pentagon: `url('/shapes/shape-2.png')`,
-
-  // Shape 3: 8-Pointed Star / Scallop Badge (uploaded_media_3)
+  // Shape 3: 8-Pointed Star / Scallop Badge (Card 3: where to find me)
   star8: `url('/shapes/shape-3.png')`,
 
-  // Shape 5: 12-Lobed Cluster Rosette (uploaded_media_5)
+  // Shape 5: 12-Lobed Cluster Rosette (Card 4: what i've made)
   rosette12: `url('/shapes/shape-5.png')`,
 
-  // Shape 0: Slanted Squircle (uploaded_media_0)
+  // Shape 0: Slanted Squircle (Card 5: selected highlights)
   slantedSquircle: `url('/shapes/shape-0.png')`,
-
-  // Shape 1: Tilted Smooth Oval (uploaded_media_1)
-  tiltedOval: `url('/shapes/shape-1.png')`,
-
-  // Shape 6: Pixel Circle (uploaded_media_6)
-  pixelCircle: `url('/shapes/shape-6.png')`,
 };
 
 function OrganicIconBadge({

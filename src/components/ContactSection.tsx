@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   MailIcon,
-  ArrowOutwardIcon,
   ChatBubbleIcon,
   CheckIcon,
 } from '@/components/ui/material-symbols';
