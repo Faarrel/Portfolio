@@ -251,7 +251,7 @@ export default function BentoSection() {
                             <b className="block text-xs sm:text-sm font-bold text-zinc-100 group-hover/item:text-white transition-colors truncate">
                               {link.handle}
                             </b>
-                            <span className="block text-[11px] sm:text-xs text-zinc-400 font-medium group-hover/item:text-zinc-200 transition-colors truncate">
+                            <span className="block text-xs text-zinc-400 font-medium group-hover/item:text-zinc-200 transition-colors truncate">
                               {link.label}
                             </span>
                           </div>
@@ -306,7 +306,7 @@ export default function BentoSection() {
                             <b className="block text-xs sm:text-sm font-bold text-zinc-100 group-hover/item:text-white transition-colors truncate">
                               {item.title}
                             </b>
-                            <span className="block text-[11px] sm:text-xs text-zinc-400 font-medium group-hover/item:text-zinc-200 transition-colors truncate">
+                            <span className="block text-xs text-zinc-400 font-medium group-hover/item:text-zinc-200 transition-colors truncate">
                               {item.subtitle}
                             </span>
                           </div>
@@ -345,13 +345,13 @@ export default function BentoSection() {
                     <span className="text-xs text-zinc-300">ıll</span>
                     <span className="text-zinc-100 font-bold">{PERSONAL_INFO.name}</span>
                   </div>
-                  <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-zinc-100 font-semibold bg-[#2a2a30] px-2.5 py-1 rounded-md">
+                  <span className="text-xs uppercase tracking-wider text-zinc-100 font-semibold bg-[#2a2a30] px-2.5 py-1 rounded-md">
                     After Effects Puppet &amp; Motion
                   </span>
                 </div>
 
                 <div>
-                  <span className="text-[10px] sm:text-[11px] text-zinc-400 uppercase tracking-wider block font-semibold">
+                  <span className="text-xs text-zinc-400 uppercase tracking-wider block font-semibold">
                     Featured Animated Illustration
                   </span>
                   <div className="text-base sm:text-xl font-bold text-white mt-1">
@@ -363,10 +363,10 @@ export default function BentoSection() {
                 </div>
 
                 <div className="pt-3 mt-3 border-t border-[#2a2a30] flex items-center justify-between text-xs text-zinc-200 font-medium">
-                  <span className="text-zinc-400 font-medium text-[11px] sm:text-xs">{featuredProject.metrics}</span>
+                  <span className="text-zinc-400 font-medium text-xs">{featuredProject.metrics}</span>
                   <a
                     href="#contact"
-                    className="text-white hover:text-zinc-200 font-semibold flex items-center gap-1 transition-colors text-[11px] sm:text-xs cursor-pointer"
+                    className="text-white hover:text-zinc-200 font-semibold flex items-center gap-1 transition-colors text-xs cursor-pointer"
                   >
                     Featured Work <OpenInNewIcon className="size-3.5" />
                   </a>
@@ -390,7 +390,7 @@ export default function BentoSection() {
                         <b className="block text-xs sm:text-sm font-bold text-zinc-100 group-hover/item:text-white transition-colors truncate">
                           {p.title}
                         </b>
-                        <span className="block text-[11px] sm:text-xs text-zinc-400 font-medium group-hover/item:text-zinc-200 transition-colors truncate">
+                        <span className="block text-xs text-zinc-400 font-medium group-hover/item:text-zinc-200 transition-colors truncate">
                           {p.categoryLabel} · {p.year} ({p.role})
                         </span>
                       </div>

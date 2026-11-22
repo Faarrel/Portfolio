@@ -193,10 +193,10 @@ export default function DiscordPresenceCard() {
   const status = lanyard?.discord_status || 'offline';
 
   const statusConfig = {
-    online: { label: 'Online', color: 'bg-emerald-500', glow: 'shadow-[0_0_10px_rgba(16,185,129,0.7)]' },
-    idle: { label: 'Idle / Away', color: 'bg-amber-400', glow: 'shadow-[0_0_10px_rgba(251,191,36,0.7)]' },
-    dnd: { label: 'Do Not Disturb', color: 'bg-rose-500', glow: 'shadow-[0_0_10px_rgba(244,63,94,0.7)]' },
-    offline: { label: 'Offline', color: 'bg-zinc-500', glow: '' },
+    online: { label: 'Online', color: 'bg-emerald-500' },
+    idle: { label: 'Idle / Away', color: 'bg-amber-400' },
+    dnd: { label: 'Do Not Disturb', color: 'bg-rose-500' },
+    offline: { label: 'Offline', color: 'bg-zinc-500' },
   }[status];
 
   const spotify = lanyard?.spotify;
@@ -254,9 +254,9 @@ export default function DiscordPresenceCard() {
               }}
             />
           )}
-          {/* Status dot */}
+          {/* Status dot (matte, no glow) */}
           <span
-            className={`absolute bottom-0 right-0 size-3.5 rounded-full border-2 border-[#202024] ${statusConfig.color} ${statusConfig.glow} z-20`}
+            className={`absolute bottom-0 right-0 size-3.5 rounded-full border-2 border-[#202024] ${statusConfig.color} z-20`}
             title={statusConfig.label}
           />
         </div>
@@ -269,9 +269,9 @@ export default function DiscordPresenceCard() {
             <button
               onClick={handleCopyUsername}
               title="Click to copy handle"
-              className="text-[11px] font-semibold text-zinc-400 hover:text-white font-mono cursor-pointer transition-colors shrink-0"
+              className="text-xs font-semibold text-zinc-400 hover:text-white font-mono cursor-pointer transition-colors shrink-0"
             >
-              @{PERSONAL_INFO.discordHandle} {copied && <span className="text-emerald-400 font-sans text-[10px]">(copied!)</span>}
+              @{PERSONAL_INFO.discordHandle} {copied && <span className="text-emerald-400 font-sans text-xs">(copied!)</span>}
             </button>
 
             {/* Official Discord Profile Badges */}
@@ -288,7 +288,7 @@ export default function DiscordPresenceCard() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 mt-0.5 text-[11px] sm:text-xs">
+          <div className="flex items-center gap-2 mt-0.5 text-xs">
             <span className={`size-1.5 rounded-full ${statusConfig.color} shrink-0`} />
             <span className="font-medium text-zinc-300 shrink-0">
               {statusConfig.label}
@@ -313,114 +313,116 @@ export default function DiscordPresenceCard() {
         </div>
       </div>
 
-      {/* Activities Container */}
-      <div className="flex flex-col gap-2.5">
-        {/* 1. Playing / Working in App (Orca / VS Code / Games) */}
-        {primaryActivity && (
-          <div className="bg-[#18181b] border border-[#2e2e36] rounded-xl p-3 flex items-center gap-3">
-            {activityImageUrl ? (
-              <img
-                src={activityImageUrl}
-                alt={primaryActivity.name}
-                className="size-11 sm:size-12 rounded-lg object-cover bg-[#2a2a30] shrink-0 border border-white/5"
-                onError={(e) => {
-                  (e.target as HTMLElement).style.display = 'none';
-                }}
-              />
-            ) : (
-              <div className="size-11 sm:size-12 rounded-lg bg-[#2a2a30] border border-white/5 flex items-center justify-center shrink-0 text-xs font-bold text-zinc-300">
-                APP
-              </div>
-            )}
+      {/* Integrated Activity Section (No Nested Card Frames) */}
+      {(primaryActivity || spotify || (!primaryActivity && !spotify)) && (
+        <div className="pt-3.5 border-t border-white/[0.08] flex flex-col gap-3">
+          {/* 1. Playing / Working in App (Orca / VS Code / Games) */}
+          {primaryActivity && (
+            <div className="flex items-start gap-3">
+              {activityImageUrl ? (
+                <img
+                  src={activityImageUrl}
+                  alt={primaryActivity.name}
+                  className="size-11 sm:size-12 rounded-xl object-cover bg-white/5 shrink-0 border border-white/10"
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              ) : (
+                <div className="size-11 sm:size-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-xs font-bold text-zinc-300">
+                  APP
+                </div>
+              )}
 
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider truncate">
-                  Playing {primaryActivity.name}
-                </span>
-                {activityElapsed && (
-                  <span className="text-[10px] font-mono text-emerald-400 font-semibold shrink-0">
-                    ⏱ {activityElapsed}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider truncate">
+                    Playing {primaryActivity.name}
                   </span>
+                  {activityElapsed && (
+                    <span className="text-xs font-mono text-emerald-400 font-semibold shrink-0">
+                      ⏱ {activityElapsed}
+                    </span>
+                  )}
+                </div>
+
+                {primaryActivity.details && (
+                  <p className="text-xs sm:text-sm font-semibold text-zinc-100 truncate mt-0.5">
+                    {primaryActivity.details}
+                  </p>
+                )}
+                {primaryActivity.state && (
+                  <p className="text-xs text-zinc-400 truncate mt-0.5">
+                    {primaryActivity.state}
+                  </p>
+                )}
+                {!primaryActivity.details && !primaryActivity.state && (
+                  <p className="text-xs sm:text-sm font-semibold text-zinc-200 truncate mt-0.5">
+                    Active in {primaryActivity.name}
+                  </p>
                 )}
               </div>
-
-              {primaryActivity.details && (
-                <p className="text-xs sm:text-sm font-semibold text-zinc-100 truncate mt-0.5">
-                  {primaryActivity.details}
-                </p>
-              )}
-              {primaryActivity.state && (
-                <p className="text-[11px] text-zinc-400 truncate">
-                  {primaryActivity.state}
-                </p>
-              )}
-              {!primaryActivity.details && !primaryActivity.state && (
-                <p className="text-xs font-semibold text-zinc-200 truncate mt-0.5">
-                  Active in {primaryActivity.name}
-                </p>
-              )}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* 2. Single Dedicated Spotify Player */}
-        {spotify && (
-          <a
-            href={`https://open.spotify.com/track/${spotify.track_id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-[#18181b] hover:bg-[#1e1e24] border border-emerald-500/25 rounded-xl p-3 flex flex-col gap-2.5 transition-colors group cursor-pointer"
-          >
-            <div className="flex items-center gap-3">
-              <img
-                src={spotify.album_art_url}
-                alt={spotify.album}
-                className="size-11 sm:size-12 rounded-md object-cover shrink-0 shadow-sm"
-              />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
-                  <span className="animate-pulse">Listening to Spotify</span>
-                  <OpenInNewIcon className="size-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-                <p className="text-xs sm:text-sm font-semibold text-zinc-100 truncate mt-0.5">
-                  {spotify.song}
-                </p>
-                <p className="text-[11px] text-zinc-400 truncate">
-                  {spotify.artist}
-                </p>
-              </div>
-              <GraphicEqIcon className="size-4 text-emerald-400 shrink-0 animate-pulse" />
-            </div>
-
-            {/* Real-time Track Progress Bar + Timer Counter */}
-            <div className="flex flex-col gap-1 pt-0.5">
-              <div className="w-full bg-zinc-800 h-1 rounded-full overflow-hidden">
-                <div
-                  className="bg-emerald-500 h-full transition-all duration-1000 ease-linear rounded-full"
-                  style={{ width: `${spotifyProgressPercent}%` }}
+          {/* 2. Single Dedicated Spotify Player */}
+          {spotify && (
+            <a
+              href={`https://open.spotify.com/track/${spotify.track_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-xl p-2.5 -mx-2.5 hover:bg-white/[0.04] flex flex-col gap-2 transition-colors group cursor-pointer"
+            >
+              <div className="flex items-center gap-3">
+                <img
+                  src={spotify.album_art_url}
+                  alt={spotify.album}
+                  className="size-11 sm:size-12 rounded-lg object-cover shrink-0 shadow-sm"
                 />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+                    <span>Listening to Spotify</span>
+                    <OpenInNewIcon className="size-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <p className="text-xs sm:text-sm font-semibold text-zinc-100 truncate mt-0.5">
+                    {spotify.song}
+                  </p>
+                  <p className="text-xs text-zinc-400 truncate">
+                    {spotify.artist}
+                  </p>
+                </div>
+                <GraphicEqIcon className="size-4 text-emerald-400 shrink-0" />
               </div>
-              <div className="flex justify-between text-[10px] font-mono text-zinc-400">
-                <span>{formatTime(spotifyCurrentMs)}</span>
-                <span>{formatTime(spotifyTotalMs)}</span>
-              </div>
-            </div>
-          </a>
-        )}
 
-        {/* 3. Fallback when neither game/app nor spotify is active */}
-        {!primaryActivity && !spotify && (
-          <div className="bg-[#18181b] border border-[#27272a]/60 rounded-xl p-3 flex items-center justify-between text-xs text-zinc-400">
-            <span className="font-medium text-zinc-300">
-              {customStatusText || 'Currently idle & creating'}
-            </span>
-            <span className="text-[11px] text-zinc-500 font-mono">
-              ID: {DISCORD_USER_ID.slice(0, 6)}...
-            </span>
-          </div>
-        )}
-      </div>
+              {/* Real-time Track Progress Bar + Timer Counter */}
+              <div className="flex flex-col gap-1 pt-0.5">
+                <div className="w-full bg-white/10 h-1 rounded-full overflow-hidden">
+                  <div
+                    className="bg-emerald-500 h-full transition-all duration-1000 ease-linear rounded-full"
+                    style={{ width: `${spotifyProgressPercent}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs font-mono text-zinc-400">
+                  <span>{formatTime(spotifyCurrentMs)}</span>
+                  <span>{formatTime(spotifyTotalMs)}</span>
+                </div>
+              </div>
+            </a>
+          )}
+
+          {/* 3. Fallback when neither game/app nor spotify is active */}
+          {!primaryActivity && !spotify && (
+            <div className="flex items-center justify-between text-xs text-zinc-400">
+              <span className="font-medium text-zinc-300">
+                {customStatusText || 'Currently idle & creating'}
+              </span>
+              <span className="text-xs text-zinc-500 font-mono">
+                ID: {DISCORD_USER_ID.slice(0, 6)}...
+              </span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
