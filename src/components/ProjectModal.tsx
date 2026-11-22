@@ -184,14 +184,28 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                 </div>
               )}
 
-              {/* Discord-style Media Attachment Grid (placed naturally below message text) */}
+              {/* Tools / Tech Stack */}
+              {item.tools && item.tools.length > 0 && (
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-0.5 text-xs text-zinc-400">
+                  <span className="text-[11px] uppercase tracking-wider font-semibold text-zinc-500">
+                    Tools:
+                  </span>
+                  {item.tools.map((tool, idx) => (
+                    <span key={tool} className="text-zinc-300 font-medium text-xs">
+                      {tool}{idx < item.tools!.length - 1 ? ' ·' : ''}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Discord-style Media Attachment Grid (Symmetrical, square, precision tiles) */}
               {galleryList.length > 0 && (
-                <div className="pt-1">
+                <div className="pt-1.5">
                   {galleryList.length === 1 ? (
                     <button
                       type="button"
                       onClick={() => setActiveLightboxIndex(0)}
-                      className="relative w-full aspect-[16/9] max-h-56 rounded-xl overflow-hidden bg-black/50 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
+                      className="relative w-full aspect-[16/9] max-h-60 rounded-2xl overflow-hidden bg-black/50 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
                     >
                       {isMediaVideo(galleryList[0]) ? (
                         <video
@@ -212,17 +226,17 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                           loading="eager"
                         />
                       )}
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1.5">
+                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1.5 backdrop-blur-[0.5px]">
                         <span>Preview 🔍</span>
                       </div>
                     </button>
                   ) : (
-                    <div className="grid grid-cols-2 gap-2 sm:gap-2.5 w-full">
-                      {/* Left Thumbnail (Item 0) */}
+                    <div className="grid grid-cols-2 gap-2.5 sm:gap-3 w-full">
+                      {/* Left Thumbnail (Item 0) - Square Aspect Ratio */}
                       <button
                         type="button"
                         onClick={() => setActiveLightboxIndex(0)}
-                        className="relative aspect-[16/10] sm:aspect-[4/3] max-h-48 sm:max-h-52 rounded-xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
+                        className="relative aspect-square rounded-2xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm ring-1 ring-white/5"
                       >
                         {isMediaVideo(galleryList[0]) ? (
                           <video
@@ -243,16 +257,16 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                             loading="eager"
                           />
                         )}
-                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[11px] font-semibold gap-1">
+                        <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1 backdrop-blur-[0.5px]">
                           <span>Preview 🔍</span>
                         </div>
                       </button>
 
-                      {/* Right Thumbnail (Item 1) with +See more overlay if count > 2 */}
+                      {/* Right Thumbnail (Item 1) - Square Aspect Ratio with Balanced Translucent Overlay */}
                       <button
                         type="button"
                         onClick={() => setActiveLightboxIndex(1)}
-                        className="relative aspect-[16/10] sm:aspect-[4/3] max-h-48 sm:max-h-52 rounded-xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
+                        className="relative aspect-square rounded-2xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm ring-1 ring-white/5"
                       >
                         {isMediaVideo(galleryList[1]) ? (
                           <video
@@ -275,36 +289,22 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                         )}
 
                         {galleryList.length > 2 ? (
-                          <div className="absolute inset-0 bg-black/60 group-hover:bg-black/50 transition-colors flex flex-col items-center justify-center text-white backdrop-blur-[2px]">
-                            <span className="text-xl sm:text-2xl font-black tracking-tight">
+                          <div className="absolute inset-0 bg-black/45 group-hover:bg-black/35 transition-colors flex flex-col items-center justify-center text-white backdrop-blur-[1px]">
+                            <span className="text-2xl sm:text-3xl font-black tracking-tight drop-shadow-md">
                               +{galleryList.length - 2}
                             </span>
-                            <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider mt-0.5">
+                            <span className="text-[10px] sm:text-[11px] font-bold text-zinc-200 uppercase tracking-widest mt-0.5 drop-shadow">
                               See More
                             </span>
                           </div>
                         ) : (
-                          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[11px] font-semibold gap-1">
+                          <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1 backdrop-blur-[0.5px]">
                             <span>Preview 🔍</span>
                           </div>
                         )}
                       </button>
                     </div>
                   )}
-                </div>
-              )}
-
-              {/* Tools / Tech Stack */}
-              {item.tools && item.tools.length > 0 && (
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-0.5 text-xs text-zinc-400">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold text-zinc-500">
-                    Tools:
-                  </span>
-                  {item.tools.map((tool, idx) => (
-                    <span key={tool} className="text-zinc-300 font-medium text-xs">
-                      {tool}{idx < item.tools!.length - 1 ? ' ·' : ''}
-                    </span>
-                  ))}
                 </div>
               )}
 
@@ -331,20 +331,20 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
               <div className="h-6 shrink-0" aria-hidden="true" />
             </div>
 
-            {/* Footer: Fixed bottom action bar */}
-            <div className="shrink-0 bg-[#161618] px-4 sm:px-6 py-3 border-t border-white/[0.08] flex items-center justify-between gap-2.5">
-              <div className="flex items-center gap-2">
+            {/* Footer: Symmetrical, precision action bar */}
+            <div className="shrink-0 bg-[#161618] px-4 sm:px-6 py-3.5 border-t border-white/[0.08]">
+              <div className="grid grid-cols-2 gap-2.5 sm:gap-3 w-full">
                 {item.externalUrl && (
                   <a
                     href={item.externalUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white transition-colors cursor-pointer"
+                    className="h-10 sm:h-11 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-xs sm:text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm hover:border-white/20 active:scale-[0.98]"
                   >
-                    {item.externalType === 'fiverr' && <FiverrIcon className="size-3.5" />}
-                    {item.externalType === 'discord' && <DiscordIcon className="size-3.5" />}
-                    {item.externalType === 'github' && <GithubIcon className="size-3.5" />}
-                    <span>
+                    {item.externalType === 'fiverr' && <FiverrIcon className="size-4 shrink-0" />}
+                    {item.externalType === 'discord' && <DiscordIcon className="size-4 shrink-0" />}
+                    {item.externalType === 'github' && <GithubIcon className="size-4 shrink-0" />}
+                    <span className="truncate">
                       {item.externalLabel ||
                         (item.externalType === 'fiverr'
                           ? 'View on Fiverr'
@@ -354,31 +354,21 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                           ? 'View on GitHub'
                           : 'View Project')}
                     </span>
-                    <OpenInNewIcon className="size-3 text-zinc-400" />
+                    <OpenInNewIcon className="size-3.5 text-zinc-400 shrink-0" />
                   </a>
                 )}
-                {item.githubUrl && item.githubUrl !== item.externalUrl && (
-                  <a
-                    href={item.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white transition-colors cursor-pointer"
-                  >
-                    <GithubIcon className="size-3.5" />
-                    <span>GitHub</span>
-                    <OpenInNewIcon className="size-3 text-zinc-400" />
-                  </a>
-                )}
-              </div>
 
-              <a
-                href="#contact"
-                onClick={onClose}
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white text-zinc-950 hover:bg-zinc-200 text-xs font-bold transition-colors cursor-pointer"
-              >
-                <MailIcon className="size-3.5" />
-                <span>Discuss</span>
-              </a>
+                <a
+                  href="#contact"
+                  onClick={onClose}
+                  className={`h-10 sm:h-11 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm active:scale-[0.98] ${
+                    !item.externalUrl ? 'col-span-2' : ''
+                  }`}
+                >
+                  <MailIcon className="size-4 shrink-0 text-zinc-950" />
+                  <span>Discuss Project</span>
+                </a>
+              </div>
             </div>
           </motion.div>
 
