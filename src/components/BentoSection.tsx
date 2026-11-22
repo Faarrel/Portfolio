@@ -24,6 +24,9 @@ const CUSTOM_MASKS = {
   // Shape 4: 4-Leaf Symmetrical Clover / Rounded Cross (uploaded_media_4)
   clover4: `url('/shapes/shape-4.png')`,
 
+  // 6-Lobed Scallop Flower (uploaded_media_1795318348921 - for live status)
+  scallop6: `url('/shapes/shape-live-status.png')`,
+
   // Shape 2: Rounded Pentagon (uploaded_media_2)
   pentagon: `url('/shapes/shape-2.png')`,
 
@@ -201,8 +204,8 @@ export default function BentoSection() {
               className="order-2 lg:order-none w-full bg-[#161618]/95 border border-[#27272a] rounded-[28px] p-5 sm:p-7 md:p-8 flex flex-col justify-between shadow-sm"
             >
               <div>
-                {/* Top Icon Badge (Rounded Pentagon - Theme Graphite) */}
-                <OrganicIconBadge mask={CUSTOM_MASKS.pentagon} bg="bg-[#2a2a30]" textColor="text-white">
+                {/* Top Icon Badge (6-Lobed Scallop Flower - Theme Graphite) */}
+                <OrganicIconBadge mask={CUSTOM_MASKS.scallop6} bg="bg-[#2a2a30]" textColor="text-white">
                   <DiscordIcon className="size-5" />
                 </OrganicIconBadge>
 
@@ -282,8 +285,12 @@ export default function BentoSection() {
               className="order-3 lg:order-none w-full bg-[#161618]/95 border border-[#27272a] rounded-[28px] p-5 sm:p-7 md:p-8 flex flex-col justify-between shadow-sm"
             >
               <div>
-                {/* Top Icon Badge (12-Lobed Cluster Rosette - Theme Graphite) */}
-                <OrganicIconBadge mask={CUSTOM_MASKS.rosette12} bg="bg-[#2a2a30]" textColor="text-white">
+                {/* Top Icon Badge (12-Lobed Cluster Rosette - Responsive Alternating Theme) */}
+                <OrganicIconBadge
+                  mask={CUSTOM_MASKS.rosette12}
+                  bg="bg-white lg:bg-[#2a2a30]"
+                  textColor="text-zinc-950 lg:text-white"
+                >
                   <LayersIcon className="size-5" />
                 </OrganicIconBadge>
 
@@ -334,8 +341,12 @@ export default function BentoSection() {
               className="order-4 lg:order-none w-full bg-[#161618]/95 border border-[#27272a] rounded-[28px] p-5 sm:p-7 md:p-8 flex flex-col justify-between shadow-sm group"
             >
             <div>
-              {/* Top Icon Badge (Slanted Squircle - Theme White) */}
-              <OrganicIconBadge mask={CUSTOM_MASKS.slantedSquircle} bg="bg-white" textColor="text-zinc-950">
+              {/* Top Icon Badge (Slanted Squircle - Responsive Alternating Theme) */}
+              <OrganicIconBadge
+                mask={CUSTOM_MASKS.slantedSquircle}
+                bg="bg-[#2a2a30] lg:bg-white"
+                textColor="text-white lg:text-zinc-950"
+              >
                 <GraphicEqIcon className="size-5" />
               </OrganicIconBadge>
 
