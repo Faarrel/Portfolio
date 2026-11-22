@@ -23,6 +23,7 @@ import {
   FIVERR_LINKS,
   GRAPHIC_DESIGN_GALLERY,
   CHARACTER_ANIMATION_GALLERY,
+  DISCORD_ARCHITECTURE_GALLERY,
 } from '@/data/portfolioData';
 import DiscordPresenceCard from '@/components/DiscordPresenceCard';
 import ProjectModal, { ProjectModalItem } from '@/components/ProjectModal';
@@ -152,6 +153,8 @@ export default function BentoSection() {
         year: '2023 - 2026',
         tools: ['Discord API', 'Security Bots', 'Role Hierarchy'],
         metrics: '45,000+ Members Managed · 0 Raid Breaches',
+        previewUrl: DISCORD_ARCHITECTURE_GALLERY[0],
+        gallery: DISCORD_ARCHITECTURE_GALLERY,
         details: [
           'Tiered role hierarchies, permission matrices, and automated anti-raid gates',
           'Clean channel taxonomy, custom banner art, and onboarding flows',
@@ -460,7 +463,7 @@ export default function BentoSection() {
 
                 <div>
                   <span className="text-xs text-zinc-400 uppercase tracking-wider block font-semibold">
-                    Featured Discord Graphics Suite
+                    Featured Discord Profile &amp; Server Art
                   </span>
                   <div className="text-base sm:text-xl font-bold text-white group-hover/featured:text-zinc-200 transition-colors mt-1">
                     {featuredProject.title}

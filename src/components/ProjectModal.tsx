@@ -123,26 +123,21 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 16 }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full max-w-lg sm:max-w-xl md:max-w-2xl max-h-[85vh] max-h-[85dvh] bg-[#161618] border border-[#27272a] rounded-[22px] sm:rounded-[24px] shadow-2xl z-10 flex flex-col overflow-hidden"
+            className="relative w-full max-w-lg sm:max-w-xl md:max-w-2xl max-h-[88vh] max-h-[88dvh] bg-[#161618] border border-[#27272a] rounded-[22px] sm:rounded-[24px] shadow-2xl z-10 flex flex-col overflow-hidden my-auto"
           >
-            {/* Header: Fixed top bar above scroll container */}
-            <div className="shrink-0 bg-[#161618] px-4 sm:px-6 py-3 border-b border-white/[0.08] flex items-center justify-between">
+            {/* Header: Clean, refined top bar without clunky badges */}
+            <div className="shrink-0 bg-[#161618] px-4 sm:px-6 py-3.5 border-b border-white/[0.08] flex items-center justify-between">
               <div className="flex items-center gap-2 min-w-0">
-                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300 bg-white/5 border border-white/10 px-2.5 py-0.5 rounded-full shrink-0">
+                <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-widest text-zinc-400">
                   {item.categoryLabel || 'Showcase'}
                 </span>
-                {item.metrics && (
-                  <span className="hidden sm:inline-block text-xs font-mono font-medium text-zinc-400 bg-[#202024] border border-[#27272a] px-2 py-0.5 rounded-md truncate max-w-[220px]">
-                    ⏱ {item.metrics}
-                  </span>
-                )}
               </div>
 
               <button
                 type="button"
                 onClick={onClose}
                 aria-label="Close modal"
-                className="size-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer shrink-0"
+                className="size-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer shrink-0 ml-2"
               >
                 <CloseIcon className="size-4" />
               </button>
@@ -197,7 +192,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                       <button
                         type="button"
                         onClick={() => setActiveLightboxIndex(0)}
-                        className="relative aspect-square rounded-xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
+                        className="relative aspect-[16/10] sm:aspect-[4/3] max-h-44 sm:max-h-52 rounded-xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
                       >
                         {isMediaVideo(item.gallery[0]) ? (
                           <video
@@ -227,7 +222,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                       <button
                         type="button"
                         onClick={() => setActiveLightboxIndex(1)}
-                        className="relative aspect-square rounded-xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
+                        className="relative aspect-[16/10] sm:aspect-[4/3] max-h-44 sm:max-h-52 rounded-xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
                       >
                         {isMediaVideo(item.gallery[1]) ? (
                           <video
@@ -307,17 +302,9 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                   {item.title}
                 </h3>
 
-                {(item.role || item.year) && (
-                  <p className="text-xs text-zinc-400 font-medium mt-1">
-                    {item.role} {item.role && item.year && '·'} {item.year}
-                  </p>
-                )}
-
-                {item.metrics && (
-                  <div className="sm:hidden inline-block mt-2 text-xs font-mono font-medium text-zinc-400 bg-[#202024] border border-[#27272a] px-2 py-0.5 rounded-md">
-                    ⏱ {item.metrics}
-                  </div>
-                )}
+                <p className="text-xs text-zinc-400 font-medium mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                  {[item.role, item.year, item.metrics].filter(Boolean).join(' · ')}
+                </p>
               </div>
 
               {/* Description */}
@@ -342,15 +329,15 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                 </div>
               )}
 
-              {/* Tools / Tech Stack Pills */}
+              {/* Tools / Tech Stack (Clean text list without clunky pill boxes) */}
               {item.tools && item.tools.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {item.tools.map((tool) => (
-                    <span
-                      key={tool}
-                      className="text-[11px] font-medium text-zinc-200 bg-[#202024] border border-[#27272a] px-2.5 py-0.5 rounded-md"
-                    >
-                      {tool}
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-0.5 text-xs text-zinc-400">
+                  <span className="text-[11px] uppercase tracking-wider font-semibold text-zinc-500">
+                    Tools:
+                  </span>
+                  {item.tools.map((tool, idx) => (
+                    <span key={tool} className="text-zinc-300 font-medium text-xs">
+                      {tool}{idx < item.tools!.length - 1 ? ' ·' : ''}
                     </span>
                   ))}
                 </div>
@@ -358,7 +345,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
 
               {/* Verified Client Review (from Fiverr) */}
               {item.clientReview && (
-                <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08]">
+                <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] mb-2">
                   <div className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-1.5 font-semibold text-zinc-200">
                       <span>Verified Client Review</span>
@@ -374,6 +361,9 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                   </p>
                 </div>
               )}
+
+              {/* Dedicated bottom spacer to ensure content and review border are never clipped */}
+              <div className="h-6 shrink-0" aria-hidden="true" />
             </div>
 
             {/* Footer: Fixed bottom action bar */}
