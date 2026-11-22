@@ -117,7 +117,7 @@ export default function BentoSection() {
         year: '2024 - 2026',
         tools: ['After Effects', 'Photoshop', 'Alight Motion'],
         metrics: '136+ Reviews · 5.0 Rating · 60 FPS Loops',
-        previewUrl: 'https://fiverr-res.cloudinary.com/image/upload/t_delivery_thumb,q_auto,f_auto/v1/attachments/delivery/asset/9cfc3526fec9e2c07f10d5305eb57165-1750905742/ezgif.com-resize.gif',
+        previewUrl: 'https://fiverr-res.cloudinary.com/video/upload/so_0/jnfbmxmd0zr3i6dckiwi.jpg',
         gallery: PROJECTS[0].gallery,
         details: [
           'Natural eye blinking, hair physics sway, and chest breathing motion cycles',

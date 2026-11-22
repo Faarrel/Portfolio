@@ -41,6 +41,31 @@ interface ProjectModalProps {
   onClose: () => void;
 }
 
+const isMediaVideo = (url?: string | null): boolean => {
+  if (!url) return false;
+  return url.includes('/video/upload/') || url.endsWith('.mp4') || url.endsWith('.webm');
+};
+
+const getVideoPoster = (url: string): string => {
+  if (!isMediaVideo(url)) return url;
+  const clean = url.replace(/\.(mp4|webm)$/i, '');
+  if (clean.includes('/video/upload/t_fiverr_hd/')) {
+    return clean.replace('/video/upload/t_fiverr_hd/', '/video/upload/so_0/') + '.jpg';
+  }
+  if (clean.includes('/video/upload/')) {
+    return clean.replace('/video/upload/', '/video/upload/so_0/') + '.jpg';
+  }
+  return clean + '.jpg';
+};
+
+const getVideoSource = (url: string): string => {
+  if (!isMediaVideo(url)) return url;
+  if (!url.endsWith('.mp4') && !url.endsWith('.webm')) {
+    return url + '.mp4';
+  }
+  return url;
+};
+
 export default function ProjectModal({ item, onClose }: ProjectModalProps) {
   const [activeLightboxIndex, setActiveLightboxIndex] = useState<number | null>(null);
 
@@ -143,13 +168,25 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                       onClick={() => setActiveLightboxIndex(0)}
                       className="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-black/50 border border-white/10 group cursor-pointer hover:border-white/30 transition-all"
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={item.gallery[0]}
-                        alt={item.title}
-                        className="w-full h-full object-cover"
-                        loading="eager"
-                      />
+                      {isMediaVideo(item.gallery[0]) ? (
+                        <video
+                          src={getVideoSource(item.gallery[0])}
+                          poster={getVideoPoster(item.gallery[0])}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={item.gallery[0]}
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                          loading="eager"
+                        />
+                      )}
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1">
                         <span>Preview 🔍</span>
                       </div>
@@ -162,13 +199,25 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                         onClick={() => setActiveLightboxIndex(0)}
                         className="relative aspect-square rounded-xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={item.gallery[0]}
-                          alt={`${item.title} thumbnail 1`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="eager"
-                        />
+                        {isMediaVideo(item.gallery[0]) ? (
+                          <video
+                            src={getVideoSource(item.gallery[0])}
+                            poster={getVideoPoster(item.gallery[0])}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={item.gallery[0]}
+                            alt={`${item.title} thumbnail 1`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="eager"
+                          />
+                        )}
                         <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[11px] font-semibold gap-1">
                           <span>Preview 🔍</span>
                         </div>
@@ -180,13 +229,25 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                         onClick={() => setActiveLightboxIndex(1)}
                         className="relative aspect-square rounded-xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={item.gallery[1]}
-                          alt={`${item.title} thumbnail 2`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="eager"
-                        />
+                        {isMediaVideo(item.gallery[1]) ? (
+                          <video
+                            src={getVideoSource(item.gallery[1])}
+                            poster={getVideoPoster(item.gallery[1])}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={item.gallery[1]}
+                            alt={`${item.title} thumbnail 2`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="eager"
+                          />
+                        )}
 
                         {item.gallery.length > 2 ? (
                           <div className="absolute inset-0 bg-black/60 group-hover:bg-black/50 transition-colors flex flex-col items-center justify-center text-white backdrop-blur-[2px]">
@@ -215,13 +276,25 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                   }}
                   className="relative w-full rounded-xl overflow-hidden bg-black/50 border border-white/10 aspect-video sm:aspect-[16/9] flex items-center justify-center group cursor-pointer hover:border-white/30 transition-all"
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.previewUrl}
-                    alt={item.title}
-                    className="w-full h-full object-cover p-1"
-                    loading="eager"
-                  />
+                  {isMediaVideo(item.previewUrl) ? (
+                    <video
+                      src={getVideoSource(item.previewUrl)}
+                      poster={getVideoPoster(item.previewUrl)}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="w-full h-full object-cover p-1"
+                    />
+                  ) : (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={item.previewUrl}
+                      alt={item.title}
+                      className="w-full h-full object-cover p-1"
+                      loading="eager"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1">
                     <span>Preview 🔍</span>
                   </div>
@@ -406,7 +479,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                     </button>
                   )}
 
-                  {/* Active Image (Uncompressed master from Cloudinary) */}
+                  {/* Active Media (Image or Video) */}
                   <motion.div
                     key={activeLightboxIndex}
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -415,12 +488,24 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                     transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
                     className="relative max-w-full max-h-[66vh] sm:max-h-[72vh] flex items-center justify-center"
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={item.gallery[activeLightboxIndex].replace('t_delivery_thumb,', '')}
-                      alt={`${item.title} enlarged ${activeLightboxIndex + 1}`}
-                      className="max-w-full max-h-[66vh] sm:max-h-[72vh] object-contain rounded-xl border border-white/15 shadow-2xl bg-black/60"
-                    />
+                    {isMediaVideo(item.gallery[activeLightboxIndex]) ? (
+                      <video
+                        src={getVideoSource(item.gallery[activeLightboxIndex])}
+                        poster={getVideoPoster(item.gallery[activeLightboxIndex])}
+                        autoPlay
+                        loop
+                        controls
+                        playsInline
+                        className="max-w-full max-h-[66vh] sm:max-h-[72vh] object-contain rounded-xl border border-white/15 shadow-2xl bg-black"
+                      />
+                    ) : (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={item.gallery[activeLightboxIndex].replace('t_delivery_thumb,', '')}
+                        alt={`${item.title} enlarged ${activeLightboxIndex + 1}`}
+                        className="max-w-full max-h-[66vh] sm:max-h-[72vh] object-contain rounded-xl border border-white/15 shadow-2xl bg-black/60"
+                      />
+                    )}
                   </motion.div>
 
                   {/* Next Button */}
@@ -446,6 +531,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                     <div className="flex items-center gap-2 px-3 py-2 bg-[#121214]/90 border border-white/10 rounded-2xl backdrop-blur-md max-w-full overflow-x-auto shadow-2xl">
                       {item.gallery.map((thumbUrl, idx) => {
                         const isActive = idx === activeLightboxIndex;
+                        const poster = isMediaVideo(thumbUrl) ? getVideoPoster(thumbUrl) : thumbUrl;
                         return (
                           <button
                             key={idx}
@@ -459,7 +545,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                           >
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                              src={thumbUrl}
+                              src={poster}
                               alt={`Thumb ${idx + 1}`}
                               className="w-full h-full object-cover"
                             />
