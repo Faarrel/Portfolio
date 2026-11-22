@@ -177,7 +177,7 @@ const HWF_CSS = `
 .hwf-brand strong { display: block; font-weight: 700; color: #ffffff; font-size: 15px; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 4px; }
 .hwf-brand span { color: #a1a1aa; font-size: 12px; font-weight: 500; text-transform: none; display: block; line-height: 1.5; }
 .hwf-col { margin-left: auto; text-align: right; }
-.hwf-col h3 { margin: 0; font: inherit; font-weight: 700; color: #71717a; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; text-align: right; }
+.hwf-col h3 { margin: 0; font: inherit; font-weight: 700; color: #a1a1aa; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; text-align: right; }
 .hwf-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 .hwf-col a, .hwf-up {
   color: #e4e4e7; font-weight: 600; text-decoration: none; opacity: 1; background: none; border: 0; padding: 3px 0;
@@ -201,7 +201,7 @@ const HWF_CSS = `
   .hwf-brand strong { font-size: 14px; margin-bottom: 2px; }
   .hwf-brand span { font-size: 11px; line-height: 1.4; }
   .hwf-col { margin-left: 0; text-align: left; }
-  .hwf-col h3 { text-align: left; margin-bottom: 6px; font-size: 10px; }
+  .hwf-col h3 { text-align: left; margin-bottom: 6px; font-size: 12px; }
   .hwf-col ul { align-items: flex-start; gap: 2px; }
   .hwf-col a, .hwf-up { font-size: 12px; padding: 2px 0; }
 }

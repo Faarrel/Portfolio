@@ -248,7 +248,7 @@ export default function DiscordPresenceCard() {
   const spotifyProgressPercent = spotifyTotalMs > 0 ? (spotifyCurrentMs / spotifyTotalMs) * 100 : 0;
 
   return (
-    <div className="rounded-2xl overflow-hidden bg-[#202024] border border-[#27272a] p-4 sm:p-5 flex flex-col justify-between gap-4">
+    <div className="flex flex-col gap-4">
       {/* Header: Avatar, Name, Handle, Badges, Status */}
       <div className="flex items-center gap-3.5 min-w-0">
         <div className="relative shrink-0 size-12 sm:size-14 flex items-center justify-center">
