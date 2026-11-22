@@ -206,6 +206,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                     <button
                       type="button"
                       onClick={() => setActiveLightboxIndex(0)}
+                      aria-label={`View ${item.title} preview`}
                       className="relative w-full aspect-[16/9] max-h-60 rounded-2xl overflow-hidden bg-black/50 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
                     >
                       {isMediaVideo(galleryList[0]) ? (
@@ -239,6 +240,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                       <button
                         type="button"
                         onClick={() => setActiveLightboxIndex(0)}
+                        aria-label={`View ${item.title} preview 1`}
                         className="relative aspect-square rounded-2xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm ring-1 ring-white/5"
                       >
                         {isMediaVideo(galleryList[0]) ? (
@@ -271,6 +273,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                       <button
                         type="button"
                         onClick={() => setActiveLightboxIndex(1)}
+                        aria-label={galleryList.length > 2 ? `View all ${galleryList.length} media items` : `View ${item.title} preview 2`}
                         className="relative aspect-square rounded-2xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm ring-1 ring-white/5"
                       >
                         {isMediaVideo(galleryList[1]) ? (
@@ -379,21 +382,35 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
             </div>
           </motion.div>
 
-          {/* Discord-Style Fullscreen Lightbox Preview (Photo 2) */}
+          {/* Discord-Style Fullscreen Lightbox Preview */}
           <AnimatePresence>
             {activeLightboxIndex !== null && galleryList.length > 0 && (
-              <div className="fixed inset-0 z-[120] flex flex-col justify-between p-3 sm:p-6 overflow-hidden select-none">
+              <motion.div
+                key="lightbox-container"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                className="fixed inset-0 z-[120] flex flex-col justify-between p-3 sm:p-6 overflow-hidden select-none"
+              >
                 {/* Backdrop */}
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
                   onClick={() => setActiveLightboxIndex(null)}
                   className="fixed inset-0 bg-black/95 backdrop-blur-xl cursor-pointer"
                 />
 
                 {/* Top Control Bar */}
-                <div className="relative z-10 flex items-center justify-between w-full max-w-6xl mx-auto py-2 px-1">
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="relative z-10 flex items-center justify-between w-full max-w-6xl mx-auto py-2 px-1"
+                >
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-mono font-medium text-zinc-400 bg-white/10 px-2.5 py-1 rounded-md">
                       {activeLightboxIndex + 1} / {galleryList.length}
@@ -407,11 +424,11 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                     type="button"
                     onClick={() => setActiveLightboxIndex(null)}
                     aria-label="Close preview"
-                    className="size-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-zinc-300 hover:text-white transition-colors cursor-pointer"
+                    className="size-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-zinc-300 hover:text-white transition-colors cursor-pointer active:scale-95"
                   >
                     <CloseIcon className="size-4" />
                   </button>
-                </div>
+                </motion.div>
 
                 {/* Center Image Display with Arrow Controls */}
                 <div className="relative z-10 flex-1 flex items-center justify-center min-h-0 my-auto px-2 sm:px-12">
@@ -425,19 +442,19 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                         )
                       }
                       aria-label="Previous image"
-                      className="absolute left-1 sm:left-4 z-20 size-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center transition-colors cursor-pointer shadow-lg"
+                      className="absolute left-1 sm:left-4 z-20 size-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center transition-colors cursor-pointer shadow-lg active:scale-95"
                     >
                       <ChevronLeftIcon className="size-5" />
                     </button>
                   )}
 
-                  {/* Active Media (Image or Video) */}
+                  {/* Active Media (Image or Video) with Smooth Enter & Exit Scale Animation */}
                   <motion.div
                     key={activeLightboxIndex}
-                    initial={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0, scale: 0.92 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                    exit={{ opacity: 0, scale: 0.92 }}
+                    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
                     className="relative max-w-full max-h-[66vh] sm:max-h-[72vh] flex items-center justify-center"
                   >
                     {isMediaVideo(galleryList[activeLightboxIndex]) ? (
@@ -470,16 +487,22 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                         )
                       }
                       aria-label="Next image"
-                      className="absolute right-1 sm:right-4 z-20 size-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center transition-colors cursor-pointer shadow-lg"
+                      className="absolute right-1 sm:right-4 z-20 size-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center transition-colors cursor-pointer shadow-lg active:scale-95"
                     >
                       <ChevronRightIcon className="size-5" />
                     </button>
                   )}
                 </div>
 
-                {/* Bottom Discord-Style Thumbnail Strip (Photo 2) */}
+                {/* Bottom Discord-Style Thumbnail Strip */}
                 {galleryList.length > 1 && (
-                  <div className="relative z-10 w-full max-w-xl mx-auto pt-2 pb-1 flex justify-center">
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 12 }}
+                    transition={{ duration: 0.2 }}
+                    className="relative z-10 w-full max-w-xl mx-auto pt-2 pb-1 flex justify-center"
+                  >
                     <div className="flex items-center gap-2 px-3 py-2 bg-[#121214]/90 border border-white/10 rounded-2xl backdrop-blur-md max-w-full overflow-x-auto shadow-2xl">
                       {galleryList.map((thumbUrl, idx) => {
                         const isActive = idx === activeLightboxIndex;
@@ -505,9 +528,9 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                         );
                       })}
                     </div>
-                  </div>
+                  </motion.div>
                 )}
-              </div>
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
