@@ -11,6 +11,7 @@ import {
   MailIcon,
   FiverrIcon,
   DiscordIcon,
+  SearchIcon,
 } from '@/components/ui/material-symbols';
 
 export interface ProjectModalItem {
@@ -226,8 +227,10 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                           loading="eager"
                         />
                       )}
-                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1.5 backdrop-blur-[0.5px]">
-                        <span>Preview 🔍</span>
+                      <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[1px]">
+                        <div className="size-10 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
+                          <SearchIcon className="size-5" />
+                        </div>
                       </div>
                     </button>
                   ) : (
@@ -257,8 +260,10 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                             loading="eager"
                           />
                         )}
-                        <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1 backdrop-blur-[0.5px]">
-                          <span>Preview 🔍</span>
+                        <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[1px]">
+                          <div className="size-10 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
+                            <SearchIcon className="size-5" />
+                          </div>
                         </div>
                       </button>
 
@@ -298,8 +303,10 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                             </span>
                           </div>
                         ) : (
-                          <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1 backdrop-blur-[0.5px]">
-                            <span>Preview 🔍</span>
+                          <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[1px]">
+                            <div className="size-10 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
+                              <SearchIcon className="size-5" />
+                            </div>
                           </div>
                         )}
                       </button>
