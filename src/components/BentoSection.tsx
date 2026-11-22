@@ -17,7 +17,13 @@ import {
   InstagramIcon,
   FiverrIcon,
 } from '@/components/ui/material-symbols';
-import { PERSONAL_INFO, PROJECTS, FIVERR_LINKS } from '@/data/portfolioData';
+import {
+  PERSONAL_INFO,
+  PROJECTS,
+  FIVERR_LINKS,
+  GRAPHIC_DESIGN_GALLERY,
+  CHARACTER_ANIMATION_GALLERY,
+} from '@/data/portfolioData';
 import DiscordPresenceCard from '@/components/DiscordPresenceCard';
 import ProjectModal, { ProjectModalItem } from '@/components/ProjectModal';
 
@@ -88,8 +94,8 @@ export default function BentoSection() {
         year: '2024 - 2026',
         tools: ['Photoshop', 'Alight Motion', 'Illustrator', 'Figma'],
         metrics: '300+ Delivered Orders · 4.9 Rating',
-        previewUrl: 'https://fiverr-res.cloudinary.com/image/upload/t_delivery_thumb,q_auto,f_auto/v1/attachments/delivery/asset/80384ee983d0369bf97679af69f512ed-1744382455/giv.gif',
-        gallery: PROJECTS[3].gallery,
+        previewUrl: GRAPHIC_DESIGN_GALLERY[0],
+        gallery: GRAPHIC_DESIGN_GALLERY,
         details: [
           'Brand identity suites, logotypes, stream overlays, and banner graphics',
           'Aesthetic monochrome and anime/cyberpunk creative compositions',
@@ -118,7 +124,7 @@ export default function BentoSection() {
         tools: ['After Effects', 'Photoshop', 'Alight Motion'],
         metrics: '136+ Reviews · 5.0 Rating · 60 FPS Loops',
         previewUrl: 'https://fiverr-res.cloudinary.com/video/upload/so_0/jnfbmxmd0zr3i6dckiwi.jpg',
-        gallery: PROJECTS[0].gallery,
+        gallery: CHARACTER_ANIMATION_GALLERY,
         details: [
           'Natural eye blinking, hair physics sway, and chest breathing motion cycles',
           'Lightweight 60 FPS web-ready deliverables (GIF, APNG, MP4)',
@@ -146,8 +152,6 @@ export default function BentoSection() {
         year: '2023 - 2026',
         tools: ['Discord API', 'Security Bots', 'Role Hierarchy'],
         metrics: '45,000+ Members Managed · 0 Raid Breaches',
-        previewUrl: 'https://fiverr-res.cloudinary.com/image/upload/t_delivery_thumb,q_auto,f_auto/v1/attachments/delivery/asset/3e1924c7d8dabb27526975cc6bf5793e-1721827595/spartan-ezgif.com-resize.gif',
-        gallery: PROJECTS[4].gallery,
         details: [
           'Tiered role hierarchies, permission matrices, and automated anti-raid gates',
           'Clean channel taxonomy, custom banner art, and onboarding flows',
@@ -197,7 +201,7 @@ export default function BentoSection() {
   ];
 
   const featuredProject = PROJECTS[0];
-  const secondaryProjects = PROJECTS.slice(1, 3);
+  const secondaryProjects = PROJECTS.slice(1, 4);
 
   return (
     <section id="work" className="py-16 sm:py-28 px-4 sm:px-8 md:px-12 bg-transparent overflow-hidden">
@@ -456,7 +460,7 @@ export default function BentoSection() {
 
                 <div>
                   <span className="text-xs text-zinc-400 uppercase tracking-wider block font-semibold">
-                    Featured Animated Illustration &amp; Rig
+                    Featured Discord Graphics Suite
                   </span>
                   <div className="text-base sm:text-xl font-bold text-white group-hover/featured:text-zinc-200 transition-colors mt-1">
                     {featuredProject.title}
