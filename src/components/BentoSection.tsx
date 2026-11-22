@@ -222,8 +222,8 @@ export default function BentoSection() {
               identity &amp; craft<span className="text-[#888888]">.</span>
             </h2>
           </div>
-          <p className="text-xs sm:text-base text-zinc-100 max-w-md font-medium leading-relaxed text-pretty text-right sm:self-end ml-auto">
-            An organic bento hub spanning personal identity, live presence, capabilities, and selected works.
+          <p className="text-xs sm:text-base text-zinc-400 max-w-md font-medium leading-relaxed text-pretty text-right sm:self-end ml-auto">
+            A curated showcase of visual design, character animation, Discord infrastructure, and fullstack development.
           </p>
         </motion.div>
 
