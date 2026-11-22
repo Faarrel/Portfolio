@@ -1,0 +1,46 @@
+{
+  "component": {
+    "type": 17,
+    "accent_color": 16777215,
+    "spoiler": false,
+    "components": [
+      {
+        "type": 10,
+        "content": "# [Faarrel](https://faarrel.my.id)\n**Graphic Designer · Character Animator · Fullstack Developer**\n\nOperating at the intersection of visual creativity and engineering. Specializing in graphic design (Photoshop, Alight Motion), character animation (After Effects), Discord server architecture, and fullstack web & bot development."
+      },
+      {
+        "type": 12,
+        "items": [
+          {
+            "media": {
+              "url": "https://faarrel.my.id/og-image.png"
+            }
+          }
+        ]
+      },
+      {
+        "type": 1,
+        "components": [
+          {
+            "type": 2,
+            "style": 5,
+            "label": "Visit Portfolio",
+            "url": "https://faarrel.my.id"
+          },
+          {
+            "type": 2,
+            "style": 5,
+            "label": "Fiverr Services",
+            "url": "https://www.fiverr.com/faarrel"
+          },
+          {
+            "type": 2,
+            "style": 5,
+            "label": "Discord Profile",
+            "url": "https://discord.com/users/938045579215380510"
+          }
+        ]
+      }
+    ]
+  }
+}
