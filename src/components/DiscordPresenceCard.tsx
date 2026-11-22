@@ -33,12 +33,6 @@ interface LanyardData {
     discriminator: string;
     global_name?: string | null;
     display_name?: string | null;
-    primary_guild?: {
-      badge: string;
-      identity_enabled: boolean;
-      identity_guild_id: string;
-      tag: string;
-    } | null;
     avatar_decoration_data?: {
       asset: string;
       sku_id: string;
@@ -79,7 +73,8 @@ function formatElapsed(startTimestamp: number) {
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
 
-function getAssetUrl(appId?: string, asset?: string) {
+function getAssetUrl(appId?: string, largeAsset?: string, smallAsset?: string) {
+  const asset = largeAsset || smallAsset;
   if (!asset) return null;
   if (asset.startsWith('mp:external/')) {
     const raw = asset.replace('mp:external/', '');
@@ -141,9 +136,16 @@ export default function DiscordPresenceCard() {
     return () => clearInterval(timer);
   }, [lanyard?.spotify]);
 
-  // Non-custom activity elapsed stopwatch ticker
-  const nonCustomActivities = lanyard?.activities?.filter((a) => a.type !== 4) || [];
-  const primaryActivity = nonCustomActivities[0];
+  // Extract non-Spotify game/app activity (Orca, games, VS Code, etc.)
+  const gameOrAppActivities = lanyard?.activities?.filter((a) => {
+    if (a.type === 4) return false; // custom status
+    if (a.type === 2) return false; // listening
+    if (a.name.toLowerCase() === 'spotify') return false;
+    if (a.id && a.id.startsWith('spotify:')) return false;
+    return true;
+  }) || [];
+
+  const primaryActivity = gameOrAppActivities[0];
 
   useEffect(() => {
     if (!primaryActivity?.timestamps?.start) {
@@ -182,9 +184,8 @@ export default function DiscordPresenceCard() {
     ? `https://cdn.discordapp.com/avatar-decoration-presets/${lanyard.discord_user.avatar_decoration_data.asset}.png`
     : null;
 
-  const clan = lanyard?.discord_user?.primary_guild;
-  const clanBadgeUrl = clan?.badge && clan?.identity_guild_id
-    ? `https://cdn.discordapp.com/clan-badges/${clan.identity_guild_id}/${clan.badge}.png`
+  const activityImageUrl = primaryActivity
+    ? getAssetUrl(primaryActivity.application_id, primaryActivity.assets?.large_image, primaryActivity.assets?.small_image)
     : null;
 
   const handleCopyUsername = () => {
@@ -198,7 +199,7 @@ export default function DiscordPresenceCard() {
 
   return (
     <div className="rounded-2xl overflow-hidden bg-[#202024] border border-[#27272a] p-4 sm:p-5 flex flex-col justify-between gap-4">
-      {/* Header: Avatar, Name, Handle, Clan Tag, Status */}
+      {/* Header: Avatar, Name, Handle, Badges, Status */}
       <div className="flex items-center gap-3.5 min-w-0">
         <div className="relative shrink-0">
           <img
@@ -213,7 +214,7 @@ export default function DiscordPresenceCard() {
             <img
               src={avatarDecorationUrl}
               alt="Avatar Decoration"
-              className="absolute -top-2 -left-2 size-16 sm:size-17 pointer-events-none select-none z-10"
+              className="absolute -top-2.5 -left-2.5 size-17 sm:size-18 pointer-events-none select-none z-10"
             />
           )}
           {/* Status dot */}
@@ -236,15 +237,27 @@ export default function DiscordPresenceCard() {
               @{PERSONAL_INFO.discordHandle} {copied && <span className="text-emerald-400 font-sans text-[10px]">(copied!)</span>}
             </button>
 
-            {/* Clan / Guild Tag */}
-            {clan?.tag && (
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-zinc-200 bg-[#2a2a30] border border-white/5 px-1.5 py-0.5 rounded-md">
-                {clanBadgeUrl && (
-                  <img src={clanBadgeUrl} alt={clan.tag} className="size-3 object-contain shrink-0" />
-                )}
-                <span>{clan.tag}</span>
+            {/* Discord Badges */}
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#18181b] border border-white/5 shrink-0">
+              {/* Nitro Badge */}
+              <span title="Discord Nitro Subscriber">
+                <svg className="size-3.5 fill-[#f47fff]" viewBox="0 0 24 24">
+                  <path d="M19.44 14.53l-3.35 4.31a1.2 1.2 0 0 1-1.9 0l-3.35-4.31a1.2 1.2 0 0 1 .15-1.63l4.15-3.69a1.2 1.2 0 0 1 1.6 0l4.15 3.69a1.2 1.2 0 0 1 .15 1.63z" />
+                </svg>
               </span>
-            )}
+              {/* Server Booster Badge */}
+              <span title="Server Booster">
+                <svg className="size-3.5 fill-[#f47fff]" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+              </span>
+              {/* Active Developer Badge */}
+              <span title="Active Developer">
+                <svg className="size-3.5 fill-[#57f287]" viewBox="0 0 24 24">
+                  <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.5h-2v-2h2zm0-4h-2V7h2z" />
+                </svg>
+              </span>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 mt-0.5 text-[11px] sm:text-xs">
@@ -272,22 +285,22 @@ export default function DiscordPresenceCard() {
         </div>
       </div>
 
-      {/* Activities Container: Render Active App AND Spotify if both present */}
+      {/* Activities Container */}
       <div className="flex flex-col gap-2.5">
-        {/* 1. Playing / Working in App (e.g. Orca / VS Code / Games) */}
+        {/* 1. Playing / Working in App (Orca / VS Code / Games) */}
         {primaryActivity && (
           <div className="bg-[#18181b] border border-[#2e2e36] rounded-xl p-3 flex items-center gap-3">
-            {getAssetUrl(primaryActivity.application_id, primaryActivity.assets?.large_image) ? (
+            {activityImageUrl ? (
               <img
-                src={getAssetUrl(primaryActivity.application_id, primaryActivity.assets?.large_image)!}
+                src={activityImageUrl}
                 alt={primaryActivity.name}
-                className="size-11 rounded-lg object-cover bg-[#2a2a30] shrink-0 border border-white/5"
+                className="size-11 sm:size-12 rounded-lg object-cover bg-[#2a2a30] shrink-0 border border-white/5"
                 onError={(e) => {
                   (e.target as HTMLElement).style.display = 'none';
                 }}
               />
             ) : (
-              <div className="size-11 rounded-lg bg-[#2a2a30] border border-white/5 flex items-center justify-center shrink-0 text-xs font-bold text-zinc-300">
+              <div className="size-11 sm:size-12 rounded-lg bg-[#2a2a30] border border-white/5 flex items-center justify-center shrink-0 text-xs font-bold text-zinc-300">
                 APP
               </div>
             )}
@@ -323,7 +336,7 @@ export default function DiscordPresenceCard() {
           </div>
         )}
 
-        {/* 2. Listening to Spotify Player */}
+        {/* 2. Single Dedicated Spotify Player */}
         {spotify && (
           <a
             href={`https://open.spotify.com/track/${spotify.track_id}`}
@@ -368,7 +381,7 @@ export default function DiscordPresenceCard() {
           </a>
         )}
 
-        {/* 3. Fallback when neither activity nor spotify is active */}
+        {/* 3. Fallback when neither game/app nor spotify is active */}
         {!primaryActivity && !spotify && (
           <div className="bg-[#18181b] border border-[#27272a]/60 rounded-xl p-3 flex items-center justify-between text-xs text-zinc-400">
             <span className="font-medium text-zinc-300">
