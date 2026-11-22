@@ -245,30 +245,33 @@ export default function DiscordPresenceCard() {
             >
               @{PERSONAL_INFO.discordHandle} {copied && <span className="text-emerald-400 font-sans text-[10px]">(copied!)</span>}
             </button>
-            <span className="text-[11px] text-zinc-500 font-normal shrink-0">
-              · hyperpop
-            </span>
 
-            {/* Discord Badges */}
+            {/* Official Discord Profile Badges */}
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#18181b] border border-white/5 shrink-0">
-              {/* Nitro Badge */}
-              <span title="Discord Nitro Subscriber">
-                <svg className="size-3.5 fill-[#f47fff]" viewBox="0 0 24 24">
-                  <path d="M19.44 14.53l-3.35 4.31a1.2 1.2 0 0 1-1.9 0l-3.35-4.31a1.2 1.2 0 0 1 .15-1.63l4.15-3.69a1.2 1.2 0 0 1 1.6 0l4.15 3.69a1.2 1.2 0 0 1 .15 1.63z" />
-                </svg>
-              </span>
-              {/* Server Booster Badge */}
-              <span title="Server Booster">
-                <svg className="size-3.5 fill-[#f47fff]" viewBox="0 0 24 24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-              </span>
-              {/* Active Developer Badge */}
-              <span title="Active Developer">
-                <svg className="size-3.5 fill-[#57f287]" viewBox="0 0 24 24">
-                  <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm1 14.5h-2v-2h2zm0-4h-2V7h2z" />
-                </svg>
-              </span>
+              <img
+                src="/badges/nitro.png"
+                alt="Discord Nitro"
+                title="Discord Nitro Subscriber"
+                className="size-4 object-contain"
+              />
+              <img
+                src="/badges/boost_2_months.png"
+                alt="Server Booster"
+                title="Server Booster"
+                className="size-4 object-contain"
+              />
+              <img
+                src="/badges/active_developer.png"
+                alt="Active Developer"
+                title="Active Developer"
+                className="size-4 object-contain"
+              />
+              <img
+                src="/badges/complete_a_quest.png"
+                alt="Completed a Quest"
+                title="Completed a Quest"
+                className="size-4 object-contain"
+              />
             </div>
           </div>
 
