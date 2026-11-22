@@ -151,154 +151,6 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
 
             {/* Scrollable Content Area: strictly constrained by min-h-0 so header/footer are never pushed */}
             <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4">
-              {/* Discord-style 2-Item Attachment Grid */}
-              {item.gallery && item.gallery.length > 0 ? (
-                <div className="flex flex-col gap-1.5 pt-0.5">
-                  <div className="flex items-center justify-between text-xs text-zinc-400">
-                    <span className="text-[11px] uppercase tracking-wider font-semibold text-zinc-400">
-                      Delivered Works &amp; Previews
-                    </span>
-                    <span className="text-[11px] text-zinc-400">
-                      {item.gallery.length} item{item.gallery.length > 1 ? 's' : ''} · Tap to expand
-                    </span>
-                  </div>
-
-                  {item.gallery.length === 1 ? (
-                    <button
-                      type="button"
-                      onClick={() => setActiveLightboxIndex(0)}
-                      className="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-black/50 border border-white/10 group cursor-pointer hover:border-white/30 transition-all"
-                    >
-                      {isMediaVideo(item.gallery[0]) ? (
-                        <video
-                          src={getVideoSource(item.gallery[0])}
-                          poster={getVideoPoster(item.gallery[0])}
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
-                          src={item.gallery[0]}
-                          alt={item.title}
-                          className="w-full h-full object-cover"
-                          loading="eager"
-                        />
-                      )}
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1">
-                        <span>Preview 🔍</span>
-                      </div>
-                    </button>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-2 w-full">
-                      {/* Left Thumbnail (Item 0) */}
-                      <button
-                        type="button"
-                        onClick={() => setActiveLightboxIndex(0)}
-                        className="relative aspect-[16/10] sm:aspect-[4/3] max-h-44 sm:max-h-52 rounded-xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
-                      >
-                        {isMediaVideo(item.gallery[0]) ? (
-                          <video
-                            src={getVideoSource(item.gallery[0])}
-                            poster={getVideoPoster(item.gallery[0])}
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          /* eslint-disable-next-line @next/next/no-img-element */
-                          <img
-                            src={item.gallery[0]}
-                            alt={`${item.title} thumbnail 1`}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            loading="eager"
-                          />
-                        )}
-                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[11px] font-semibold gap-1">
-                          <span>Preview 🔍</span>
-                        </div>
-                      </button>
-
-                      {/* Right Thumbnail (Item 1) with +See more overlay if count > 2 */}
-                      <button
-                        type="button"
-                        onClick={() => setActiveLightboxIndex(1)}
-                        className="relative aspect-[16/10] sm:aspect-[4/3] max-h-44 sm:max-h-52 rounded-xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
-                      >
-                        {isMediaVideo(item.gallery[1]) ? (
-                          <video
-                            src={getVideoSource(item.gallery[1])}
-                            poster={getVideoPoster(item.gallery[1])}
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          /* eslint-disable-next-line @next/next/no-img-element */
-                          <img
-                            src={item.gallery[1]}
-                            alt={`${item.title} thumbnail 2`}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            loading="eager"
-                          />
-                        )}
-
-                        {item.gallery.length > 2 ? (
-                          <div className="absolute inset-0 bg-black/60 group-hover:bg-black/50 transition-colors flex flex-col items-center justify-center text-white backdrop-blur-[2px]">
-                            <span className="text-xl sm:text-2xl font-black tracking-tight">
-                              +{item.gallery.length - 2}
-                            </span>
-                            <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider mt-0.5">
-                              See More
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[11px] font-semibold gap-1">
-                            <span>Preview 🔍</span>
-                          </div>
-                        )}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : item.previewUrl ? (
-                <button
-                  type="button"
-                  onClick={() => setActiveLightboxIndex(0)}
-                  className="relative w-full rounded-xl overflow-hidden bg-black/50 border border-white/10 aspect-video sm:aspect-[16/9] flex items-center justify-center group cursor-pointer hover:border-white/30 transition-all"
-                >
-                  {isMediaVideo(item.previewUrl) ? (
-                    <video
-                      src={getVideoSource(item.previewUrl)}
-                      poster={getVideoPoster(item.previewUrl)}
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      className="w-full h-full object-cover p-1"
-                    />
-                  ) : (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img
-                      src={item.previewUrl}
-                      alt={item.title}
-                      className="w-full h-full object-cover p-1"
-                      loading="eager"
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1">
-                    <span>Preview 🔍</span>
-                  </div>
-                </button>
-              ) : null}
-
               {/* Title & Metadata */}
               <div>
                 <h3 className="text-lg sm:text-xl font-bold tracking-tight text-white leading-tight">
@@ -317,7 +169,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
 
               {/* Key Highlights */}
               {item.details && item.details.length > 0 && (
-                <div className="flex flex-col gap-1.5 pt-1">
+                <div className="flex flex-col gap-1.5 pt-0.5">
                   <span className="text-[11px] uppercase tracking-wider font-semibold text-zinc-400">
                     Highlights
                   </span>
@@ -332,7 +184,117 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                 </div>
               )}
 
-              {/* Tools / Tech Stack (Clean text list without clunky pill boxes) */}
+              {/* Discord-style Media Attachment Grid (placed naturally below message text) */}
+              {galleryList.length > 0 && (
+                <div className="pt-1">
+                  {galleryList.length === 1 ? (
+                    <button
+                      type="button"
+                      onClick={() => setActiveLightboxIndex(0)}
+                      className="relative w-full aspect-[16/9] max-h-56 rounded-xl overflow-hidden bg-black/50 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
+                    >
+                      {isMediaVideo(galleryList[0]) ? (
+                        <video
+                          src={getVideoSource(galleryList[0])}
+                          poster={getVideoPoster(galleryList[0])}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={galleryList[0]}
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                          loading="eager"
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-semibold gap-1.5">
+                        <span>Preview 🔍</span>
+                      </div>
+                    </button>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-2 sm:gap-2.5 w-full">
+                      {/* Left Thumbnail (Item 0) */}
+                      <button
+                        type="button"
+                        onClick={() => setActiveLightboxIndex(0)}
+                        className="relative aspect-[16/10] sm:aspect-[4/3] max-h-48 sm:max-h-52 rounded-xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
+                      >
+                        {isMediaVideo(galleryList[0]) ? (
+                          <video
+                            src={getVideoSource(galleryList[0])}
+                            poster={getVideoPoster(galleryList[0])}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={galleryList[0]}
+                            alt={`${item.title} preview 1`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="eager"
+                          />
+                        )}
+                        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[11px] font-semibold gap-1">
+                          <span>Preview 🔍</span>
+                        </div>
+                      </button>
+
+                      {/* Right Thumbnail (Item 1) with +See more overlay if count > 2 */}
+                      <button
+                        type="button"
+                        onClick={() => setActiveLightboxIndex(1)}
+                        className="relative aspect-[16/10] sm:aspect-[4/3] max-h-48 sm:max-h-52 rounded-xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
+                      >
+                        {isMediaVideo(galleryList[1]) ? (
+                          <video
+                            src={getVideoSource(galleryList[1])}
+                            poster={getVideoPoster(galleryList[1])}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={galleryList[1]}
+                            alt={`${item.title} preview 2`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="eager"
+                          />
+                        )}
+
+                        {galleryList.length > 2 ? (
+                          <div className="absolute inset-0 bg-black/60 group-hover:bg-black/50 transition-colors flex flex-col items-center justify-center text-white backdrop-blur-[2px]">
+                            <span className="text-xl sm:text-2xl font-black tracking-tight">
+                              +{galleryList.length - 2}
+                            </span>
+                            <span className="text-[11px] font-bold text-zinc-300 uppercase tracking-wider mt-0.5">
+                              See More
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[11px] font-semibold gap-1">
+                            <span>Preview 🔍</span>
+                          </div>
+                        )}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Tools / Tech Stack */}
               {item.tools && item.tools.length > 0 && (
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-0.5 text-xs text-zinc-400">
                   <span className="text-[11px] uppercase tracking-wider font-semibold text-zinc-500">
