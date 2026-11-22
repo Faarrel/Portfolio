@@ -101,8 +101,7 @@ function formatElapsed(startTimestamp: number) {
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 }
 
-function getAssetUrl(appId?: string, largeAsset?: string, smallAsset?: string) {
-  const asset = largeAsset || smallAsset;
+function getAssetUrl(appId?: string, asset?: string) {
   if (!asset) return null;
   if (asset.startsWith('mp:external/')) {
     const raw = asset.replace('mp:external/', '');
@@ -113,6 +112,30 @@ function getAssetUrl(appId?: string, largeAsset?: string, smallAsset?: string) {
     return `https://cdn.discordapp.com/app-assets/${appId}/${asset}.png`;
   }
   return asset;
+}
+
+function getActivityAssets(activity?: LanyardActivity) {
+  if (!activity) return { largeUrl: null, smallUrl: null };
+  const appId = activity.application_id;
+  const largeAsset = activity.assets?.large_image;
+  const smallAsset = activity.assets?.small_image;
+
+  let largeUrl: string | null = null;
+  if (largeAsset) {
+    largeUrl = getAssetUrl(appId, largeAsset);
+  } else if (appId === '1545653843239374848' || activity.name.toLowerCase() === 'orca') {
+    // Official Orca Application Icon (Discord RPC)
+    largeUrl = 'https://cdn.discordapp.com/app-icons/1545653843239374848/45fa5380de015ee75348b94328a56a61.png';
+  } else if (appId) {
+    largeUrl = smallAsset ? getAssetUrl(appId, smallAsset) : null;
+  }
+
+  let smallUrl: string | null = null;
+  if (smallAsset && (largeAsset || appId === '1545653843239374848')) {
+    smallUrl = getAssetUrl(appId, smallAsset);
+  }
+
+  return { largeUrl, smallUrl };
 }
 
 export default function DiscordPresenceCard() {
@@ -213,9 +236,7 @@ export default function DiscordPresenceCard() {
     ? `https://cdn.discordapp.com/avatar-decoration-presets/${decorationAsset}.png?size=160&passthrough=true`
     : null;
 
-  const activityImageUrl = primaryActivity
-    ? getAssetUrl(primaryActivity.application_id, primaryActivity.assets?.large_image, primaryActivity.assets?.small_image)
-    : null;
+  const { largeUrl: activityLargeUrl, smallUrl: activitySmallUrl } = getActivityAssets(primaryActivity);
 
   const handleCopyUsername = () => {
     navigator.clipboard.writeText(PERSONAL_INFO.discordHandle);
@@ -234,7 +255,7 @@ export default function DiscordPresenceCard() {
           <img
             src={avatarUrl}
             alt="Discord Avatar"
-            className="size-full rounded-full object-cover bg-[#2a2a30] border border-white/10"
+            className="size-full object-contain"
             onError={(e) => {
               (e.target as HTMLElement).setAttribute('src', '/logo.png');
             }}
@@ -254,7 +275,7 @@ export default function DiscordPresenceCard() {
               }}
             />
           )}
-          {/* Status dot (matte, no glow) */}
+          {/* Status dot */}
           <span
             className={`absolute bottom-0 right-0 size-3.5 rounded-full border-2 border-[#202024] ${statusConfig.color} z-20`}
             title={statusConfig.label}
@@ -271,7 +292,7 @@ export default function DiscordPresenceCard() {
               title="Click to copy handle"
               className="text-xs font-semibold text-zinc-400 hover:text-white font-mono cursor-pointer transition-colors shrink-0"
             >
-              @{PERSONAL_INFO.discordHandle} {copied && <span className="text-emerald-400 font-sans text-xs">(copied!)</span>}
+              @{PERSONAL_INFO.discordHandle} {copied && <span className="text-zinc-300 font-sans text-xs">(copied!)</span>}
             </button>
 
             {/* Official Discord Profile Badges */}
@@ -313,26 +334,36 @@ export default function DiscordPresenceCard() {
         </div>
       </div>
 
-      {/* Integrated Activity Section (No Nested Card Frames) */}
+      {/* Integrated Activity Section (Monochrome & Official Dual-Icon) */}
       {(primaryActivity || spotify || (!primaryActivity && !spotify)) && (
         <div className="pt-3.5 border-t border-white/[0.08] flex flex-col gap-3">
           {/* 1. Playing / Working in App (Orca / VS Code / Games) */}
           {primaryActivity && (
             <div className="flex items-start gap-3">
-              {activityImageUrl ? (
-                <img
-                  src={activityImageUrl}
-                  alt={primaryActivity.name}
-                  className="size-11 sm:size-12 rounded-xl object-cover bg-white/5 shrink-0 border border-white/10"
-                  onError={(e) => {
-                    (e.target as HTMLElement).style.display = 'none';
-                  }}
-                />
-              ) : (
-                <div className="size-11 sm:size-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-xs font-bold text-zinc-300">
-                  APP
-                </div>
-              )}
+              <div className="relative shrink-0">
+                {activityLargeUrl ? (
+                  <img
+                    src={activityLargeUrl}
+                    alt={primaryActivity.name}
+                    className="size-11 sm:size-12 rounded-xl object-cover bg-white/5 border border-white/10 shrink-0"
+                    onError={(e) => {
+                      (e.target as HTMLElement).style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className="size-11 sm:size-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center shrink-0 text-xs font-bold text-zinc-300">
+                    APP
+                  </div>
+                )}
+                {activitySmallUrl && (
+                  <img
+                    src={activitySmallUrl}
+                    alt={primaryActivity.assets?.small_text || 'status'}
+                    title={primaryActivity.assets?.small_text}
+                    className="absolute -bottom-1 -right-1 size-5 rounded-full border-2 border-[#202024] object-contain bg-[#18181b]"
+                  />
+                )}
+              </div>
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
@@ -340,7 +371,7 @@ export default function DiscordPresenceCard() {
                     Playing {primaryActivity.name}
                   </span>
                   {activityElapsed && (
-                    <span className="text-xs font-mono text-emerald-400 font-semibold shrink-0">
+                    <span className="text-xs font-mono text-zinc-400 font-medium shrink-0">
                       ⏱ {activityElapsed}
                     </span>
                   )}
@@ -365,7 +396,7 @@ export default function DiscordPresenceCard() {
             </div>
           )}
 
-          {/* 2. Single Dedicated Spotify Player */}
+          {/* 2. Single Dedicated Spotify Player (Monochrome Scheme) */}
           {spotify && (
             <a
               href={`https://open.spotify.com/track/${spotify.track_id}`}
@@ -380,9 +411,9 @@ export default function DiscordPresenceCard() {
                   className="size-11 sm:size-12 rounded-lg object-cover shrink-0 shadow-sm"
                 />
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400 uppercase tracking-wider">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-zinc-300 uppercase tracking-wider">
                     <span>Listening to Spotify</span>
-                    <OpenInNewIcon className="size-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <OpenInNewIcon className="size-3.5 opacity-0 group-hover:opacity-100 transition-opacity text-zinc-400" />
                   </div>
                   <p className="text-xs sm:text-sm font-semibold text-zinc-100 truncate mt-0.5">
                     {spotify.song}
@@ -391,14 +422,14 @@ export default function DiscordPresenceCard() {
                     {spotify.artist}
                   </p>
                 </div>
-                <GraphicEqIcon className="size-4 text-emerald-400 shrink-0" />
+                <GraphicEqIcon className="size-4 text-zinc-300 shrink-0" />
               </div>
 
-              {/* Real-time Track Progress Bar + Timer Counter */}
+              {/* Real-time Track Progress Bar + Timer Counter (Monochrome) */}
               <div className="flex flex-col gap-1 pt-0.5">
                 <div className="w-full bg-white/10 h-1 rounded-full overflow-hidden">
                   <div
-                    className="bg-emerald-500 h-full transition-all duration-1000 ease-linear rounded-full"
+                    className="bg-zinc-200 h-full transition-all duration-1000 ease-linear rounded-full"
                     style={{ width: `${spotifyProgressPercent}%` }}
                   />
                 </div>
