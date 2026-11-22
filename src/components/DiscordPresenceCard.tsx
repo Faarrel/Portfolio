@@ -57,27 +57,27 @@ const DISCORD_BADGES = [
   {
     name: 'Gifting Legend',
     desc: 'Gifting Legend. 100 gifts given',
-    src: '/badges/gifting-legend.png',
+    src: '/badges/gifting-legend.webp',
   },
   {
     name: 'Game Time Eternal',
     desc: 'Game Time Eternal. 5,881 hours of games played',
-    src: '/badges/game-time-eternal.png',
+    src: '/badges/game-time-eternal.webp',
   },
   {
     name: 'Nitro Emerald',
     desc: 'Nitro Emerald. Subscriber since 5/17/23',
-    src: '/badges/nitro-emerald.png',
+    src: '/badges/nitro-emerald.webp',
   },
   {
     name: 'Game Variety Universalist',
     desc: 'Game Variety Universalist. 197 games played',
-    src: '/badges/game-variety-universalist.png',
+    src: '/badges/game-variety-universalist.webp',
   },
   {
     name: 'Server Boosting',
     desc: 'Server Boosting. Boosting since 11/10/23',
-    src: '/badges/server-booster-exact.png',
+    src: '/badges/server-booster-exact.webp',
   },
 ];
 
@@ -254,7 +254,7 @@ export default function DiscordPresenceCard() {
             alt="Discord Avatar"
             className="size-full object-contain"
             onError={(e) => {
-              (e.target as HTMLElement).setAttribute('src', '/logo.png');
+              (e.target as HTMLElement).setAttribute('src', '/logo.webp');
             }}
           />
           {avatarDecorationUrl && (

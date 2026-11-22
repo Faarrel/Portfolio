@@ -180,7 +180,7 @@ export default function BentoSection() {
 
               {/* Right-Center Aligned 3D Logo */}
               <img
-                src="/logo.png"
+                src="/logo.webp"
                 alt="Faarrel"
                 className="absolute top-1/2 -translate-y-1/2 right-2 sm:right-6 md:right-8 w-28 sm:w-36 md:w-44 h-auto object-contain pointer-events-none drop-shadow-[0_12px_28px_rgba(0,0,0,0.6)] select-none z-10"
               />

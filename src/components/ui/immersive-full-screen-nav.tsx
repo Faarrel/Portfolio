@@ -357,7 +357,7 @@ function FullscreenNav({
           className="cursor-pointer transition-colors duration-300 flex items-center gap-2.5 group"
           style={{ color: isOpen ? headerOpenColor : "#E0E0E0" }}
         >
-          <img src="/logo.png" alt="Faarrel" className="w-7 h-7 sm:w-8 sm:h-8 object-contain transition-transform duration-300 group-hover:scale-105" />
+          <img src="/logo.webp" alt="Faarrel" className="w-7 h-7 sm:w-8 sm:h-8 object-contain transition-transform duration-300 group-hover:scale-105" />
           <span
             className="font-planet-kosmos text-base sm:text-lg font-normal tracking-wide text-white transition-colors duration-300"
             style={{ fontFamily: "'Planet Kosmos', sans-serif" }}

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 
@@ -8,14 +8,18 @@ const montserrat = Montserrat({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#121212",
+};
+
 export const metadata: Metadata = {
-  metadataBase: new URL("http://localhost:3000"),
+  metadataBase: new URL("https://faarrel.my.id"),
   title: "Faarrel | Graphic Designer, Character Animator & Fullstack Developer",
   description: "Portfolio of Faarrel: Graphic design (Photoshop, Alight Motion), character animation & puppet motion (After Effects), Discord server architecture, and fullstack development (Next.js & discord.js/discord.py).",
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/logo.webp",
+    shortcut: "/logo.webp",
+    apple: "/logo.webp",
   },
   keywords: [
     "Faarrel",
@@ -32,9 +36,24 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Faarrel | Graphic Designer, Character Animator & Fullstack Developer",
     description: "Graphic design, character animation in After Effects, Discord server builds, and fullstack engineering.",
+    url: "https://faarrel.my.id",
+    siteName: "Faarrel Portfolio",
     type: "website",
     locale: "en_US",
-    images: ["/logo.png"],
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Faarrel Portfolio",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Faarrel | Graphic Designer, Character Animator & Fullstack Developer",
+    description: "Graphic design, character animation in After Effects, Discord server builds, and fullstack engineering.",
+    images: ["/og-image.png"],
   },
 };
 

@@ -56,7 +56,7 @@ export default function ContactSection() {
             transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="flex items-center gap-3.5 mb-4"
           >
-            <img src="/logo.png" alt="Faarrel" className="w-8 h-8 sm:w-9 sm:h-9 object-contain" />
+            <img src="/logo.webp" alt="Faarrel" className="w-8 h-8 sm:w-9 sm:h-9 object-contain" />
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-[#F4F4F5] text-balance">
               Let&apos;s talk<span className="text-[#888888]">.</span>
             </h2>
