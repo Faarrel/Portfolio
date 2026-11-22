@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Faarrel — Personal Portfolio
 
-## Getting Started
+A personal creative portfolio showcasing selected works across graphic design, character puppet animation, Discord community architecture, and web development.
 
-First, run the development server:
+> **Project Notice**: This repository is strictly a **personal portfolio site** to present creative projects and engineering work by Faarrel. It is not intended as a public template, library, or SaaS product.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Overview
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Faarrel operates across visual creativity and software engineering:
+- **Character Animation & Motion Design**: 2D puppet rigging, layer separation, ambient particle compositing, and kinetic video reels in After Effects and Photoshop.
+- **Discord Infrastructure & Bots**: Custom bots built with `discord.js` and `discord.py`, Redis caching, moderation state machines, and community architecture for servers with 45k+ members.
+- **Frontend Development**: Minimalist, high-performance web interfaces built with Next.js, React, and TypeScript.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Tech Stack
 
-To learn more about Next.js, take a look at the following resources:
+This portfolio website is built with:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Layer | Technology |
+|---|---|
+| **Framework** | Next.js 16 (App Router, Turbopack) |
+| **Library** | React 19 |
+| **Language** | TypeScript 5 |
+| **Styling** | Tailwind CSS v4 |
+| **Animation & Motion** | Framer Motion, GSAP |
+| **Smooth Scrolling** | Lenis |
+| **Icons & Typography** | Lucide React, Montserrat, Planet Kosmos |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Running Locally
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+To run this portfolio locally:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Faarrel/Portfolio.git
+   cd Portfolio
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## Connect
+
+- **Discord**: [@faarrel](https://discord.com/users/938045579215380510)
+- **GitHub**: [github.com/Faarrel](https://github.com/Faarrel)
+- **Instagram**: [@fxrrel_](https://www.instagram.com/fxrrel_/)
+- **Fiverr**: [fiverr.com/faarrel](https://www.fiverr.com/faarrel)
+- **Email**: `muhammadfarrelyf@gmail.com`
+
+---
+
+## License & Copyright
+
+All design assets, project media, brand illustrations, and animations displayed within this portfolio are the intellectual property of **Faarrel** and the respective commission clients. All rights reserved.
