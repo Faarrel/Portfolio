@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   CloseIcon,
@@ -75,6 +75,19 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
     : item?.previewUrl
     ? [item.previewUrl]
     : [];
+
+  const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Scroll active thumbnail smoothly into view when lightbox index changes
+  useEffect(() => {
+    if (activeLightboxIndex !== null && thumbnailRefs.current[activeLightboxIndex]) {
+      thumbnailRefs.current[activeLightboxIndex]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    }
+  }, [activeLightboxIndex]);
 
   // Keyboard navigation & lock body scroll
   useEffect(() => {
@@ -501,21 +514,25 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 12 }}
                     transition={{ duration: 0.2 }}
-                    className="relative z-10 w-full max-w-xl mx-auto pt-2 pb-1 flex justify-center"
+                    className="relative z-10 w-full max-w-4xl mx-auto px-4 pt-2 pb-1.5 flex justify-center"
                   >
-                    <div className="flex items-center gap-2 px-3 py-2 bg-[#121214]/90 border border-white/10 rounded-2xl backdrop-blur-md max-w-full overflow-x-auto shadow-2xl">
+                    <div className="flex items-center gap-2 sm:gap-2.5 px-3.5 py-2.5 bg-[#121214]/90 border border-white/10 rounded-2xl backdrop-blur-md max-w-full overflow-x-auto shadow-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                       {galleryList.map((thumbUrl, idx) => {
                         const isActive = idx === activeLightboxIndex;
                         const poster = isMediaVideo(thumbUrl) ? getVideoPoster(thumbUrl) : thumbUrl;
                         return (
                           <button
                             key={idx}
+                            ref={(el) => {
+                              thumbnailRefs.current[idx] = el;
+                            }}
                             type="button"
                             onClick={() => setActiveLightboxIndex(idx)}
-                            className={`size-12 sm:size-14 rounded-lg overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
+                            aria-label={`Go to preview ${idx + 1}`}
+                            className={`size-11 sm:size-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
                               isActive
                                 ? 'border-white scale-105 opacity-100 shadow-md ring-2 ring-white/20'
-                                : 'border-transparent opacity-50 hover:opacity-80'
+                                : 'border-transparent opacity-50 hover:opacity-85'
                             }`}
                           >
                             {/* eslint-disable-next-line @next/next/no-img-element */}
