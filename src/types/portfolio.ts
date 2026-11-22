@@ -23,6 +23,7 @@ export interface ProjectItem {
   externalUrl?: string;
   externalLabel?: string;
   externalType?: 'fiverr' | 'discord' | 'github' | 'external';
+  previewUrl?: string;
   clientReview?: ClientReview;
   details: string[];
 }

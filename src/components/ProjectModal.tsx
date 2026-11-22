@@ -24,6 +24,7 @@ export interface ProjectModalItem {
   externalUrl?: string;
   externalLabel?: string;
   externalType?: 'fiverr' | 'discord' | 'github' | 'external';
+  previewUrl?: string;
   clientReview?: {
     author: string;
     rating: number;
@@ -59,7 +60,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
   return (
     <AnimatePresence>
       {item && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6">
           {/* Backdrop with frosted dark blur */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -67,125 +68,143 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/80 backdrop-blur-md cursor-pointer"
+            className="fixed inset-0 bg-black/85 backdrop-blur-md cursor-pointer"
           />
 
-          {/* Modal Card */}
+          {/* Modal Dialog Card */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 16 }}
+            initial={{ opacity: 0, scale: 0.96, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 16 }}
+            exit={{ opacity: 0, scale: 0.96, y: 20 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-[#161618] border border-[#27272a] rounded-[24px] p-6 sm:p-8 shadow-2xl z-10 flex flex-col gap-6"
+            className="relative w-full sm:max-w-xl md:max-w-2xl max-h-[92dvh] sm:max-h-[88vh] bg-[#161618] border border-[#27272a] rounded-t-[24px] sm:rounded-[24px] shadow-2xl z-10 flex flex-col overflow-hidden"
           >
-            {/* Header: Category Badge & Close Button */}
-            <div className="flex items-center justify-between gap-4">
-              <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300 bg-white/5 border border-white/10 px-3 py-1 rounded-full">
-                {item.categoryLabel || 'Showcase'}
-              </span>
+            {/* Sticky Top Header */}
+            <div className="sticky top-0 z-20 bg-[#161618]/95 backdrop-blur-md px-5 sm:px-6 py-3.5 border-b border-white/[0.08] flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-300 bg-white/5 border border-white/10 px-3 py-1 rounded-full">
+                  {item.categoryLabel || 'Showcase'}
+                </span>
+                {item.metrics && (
+                  <span className="hidden sm:inline-block text-xs font-mono font-medium text-zinc-400 bg-[#202024] border border-[#27272a] px-2.5 py-0.5 rounded-md truncate max-w-[220px]">
+                    ⏱ {item.metrics}
+                  </span>
+                )}
+              </div>
 
               <button
                 type="button"
                 onClick={onClose}
                 aria-label="Close modal"
-                className="size-9 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer"
+                className="size-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer shrink-0"
               >
                 <CloseIcon className="size-4" />
               </button>
             </div>
 
-            {/* Title & Metadata */}
-            <div>
-              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white text-balance">
-                {item.title}
-              </h3>
-
-              {(item.role || item.year) && (
-                <p className="text-xs sm:text-sm text-zinc-400 font-medium mt-1.5">
-                  {item.role} {item.role && item.year && '·'} {item.year}
-                </p>
-              )}
-
-              {item.metrics && (
-                <div className="inline-block mt-2.5 text-xs font-mono font-medium text-zinc-300 bg-[#202024] border border-[#27272a] px-3 py-1 rounded-md">
-                  ⏱ {item.metrics}
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto overscroll-contain p-5 sm:p-6 space-y-4">
+              {/* Media Preview (GIF / Video / Image from Fiverr or Local CDN) */}
+              {item.previewUrl && (
+                <div className="relative w-full rounded-xl overflow-hidden bg-black/60 border border-white/10 aspect-video sm:aspect-[16/9] flex items-center justify-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.previewUrl}
+                    alt={item.title}
+                    className="w-full h-full object-contain sm:object-cover"
+                    loading="eager"
+                  />
                 </div>
               )}
-            </div>
 
-            {/* Description */}
-            <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-normal">
-              {item.description}
-            </p>
+              {/* Title & Metadata */}
+              <div>
+                <h3 className="text-lg sm:text-2xl font-bold tracking-tight text-white leading-tight">
+                  {item.title}
+                </h3>
 
-            {/* Key Deliverables / Highlights */}
-            {item.details && item.details.length > 0 && (
-              <div className="flex flex-col gap-2.5 pt-2">
-                <span className="text-xs uppercase tracking-wider font-semibold text-zinc-400">
-                  Key Highlights &amp; Architecture
-                </span>
-                <ul className="space-y-2 text-xs sm:text-sm text-zinc-300">
-                  {item.details.map((detail, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5 leading-relaxed">
-                      <span className="size-1.5 rounded-full bg-zinc-400 shrink-0 mt-2" />
-                      <span>{detail}</span>
-                    </li>
-                  ))}
-                </ul>
+                {(item.role || item.year) && (
+                  <p className="text-xs text-zinc-400 font-medium mt-1">
+                    {item.role} {item.role && item.year && '·'} {item.year}
+                  </p>
+                )}
+
+                {item.metrics && (
+                  <div className="sm:hidden inline-block mt-2 text-xs font-mono font-medium text-zinc-400 bg-[#202024] border border-[#27272a] px-2.5 py-0.5 rounded-md">
+                    ⏱ {item.metrics}
+                  </div>
+                )}
               </div>
-            )}
 
-            {/* Tools / Tech Stack Pills */}
-            {item.tools && item.tools.length > 0 && (
-              <div className="flex flex-col gap-2.5 pt-2">
-                <span className="text-xs uppercase tracking-wider font-semibold text-zinc-400">
-                  Tools &amp; Stack
-                </span>
-                <div className="flex flex-wrap gap-2">
+              {/* Concise Description */}
+              <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-normal">
+                {item.description}
+              </p>
+
+              {/* Key Highlights */}
+              {item.details && item.details.length > 0 && (
+                <div className="flex flex-col gap-1.5 pt-1">
+                  <span className="text-[11px] uppercase tracking-wider font-semibold text-zinc-400">
+                    Highlights
+                  </span>
+                  <ul className="space-y-1.5 text-xs text-zinc-300">
+                    {item.details.map((detail, idx) => (
+                      <li key={idx} className="flex items-start gap-2 leading-relaxed">
+                        <span className="size-1.5 rounded-full bg-zinc-400 shrink-0 mt-1.5" />
+                        <span>{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Tools / Tech Stack Pills */}
+              {item.tools && item.tools.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
                   {item.tools.map((tool) => (
                     <span
                       key={tool}
-                      className="text-xs font-medium text-zinc-200 bg-[#202024] border border-[#27272a] px-2.5 py-1 rounded-md"
+                      className="text-[11px] font-medium text-zinc-200 bg-[#202024] border border-[#27272a] px-2.5 py-0.5 rounded-md"
                     >
                       {tool}
                     </span>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Verified Client Review (from Fiverr) */}
-            {item.clientReview && (
-              <div className="flex flex-col gap-2 p-4 rounded-xl bg-white/[0.03] border border-white/[0.08]">
-                <div className="flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-1.5 font-semibold text-zinc-200">
-                    <span>Verified Client Review</span>
-                    <span className="text-zinc-500">·</span>
-                    <span className="text-zinc-400">@{item.clientReview.author}</span>
+              {/* Verified Client Review (from Fiverr) */}
+              {item.clientReview && (
+                <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08]">
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1.5 font-semibold text-zinc-200">
+                      <span>Verified Client Review</span>
+                      <span className="text-zinc-500">·</span>
+                      <span className="text-zinc-400">@{item.clientReview.author}</span>
+                    </div>
+                    <span className="text-amber-400 font-bold">
+                      ★ {item.clientReview.rating.toFixed(1)} / 5.0
+                    </span>
                   </div>
-                  <span className="text-amber-400 font-bold">
-                    ★ {item.clientReview.rating.toFixed(1)} / 5.0
-                  </span>
+                  <p className="text-xs text-zinc-300 italic leading-relaxed">
+                    &ldquo;{item.clientReview.comment}&rdquo;
+                  </p>
                 </div>
-                <p className="text-xs text-zinc-300 italic leading-relaxed">
-                  &ldquo;{item.clientReview.comment}&rdquo;
-                </p>
-              </div>
-            )}
+              )}
+            </div>
 
-            {/* Footer Action Buttons */}
-            <div className="pt-4 border-t border-white/[0.08] flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5">
+            {/* Sticky Bottom Action Bar */}
+            <div className="sticky bottom-0 z-20 bg-[#161618]/95 backdrop-blur-md px-5 sm:px-6 py-3 border-t border-white/[0.08] flex items-center justify-between gap-2.5 shrink-0">
+              <div className="flex items-center gap-2">
                 {item.externalUrl && (
                   <a
                     href={item.externalUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white transition-colors cursor-pointer"
                   >
-                    {item.externalType === 'fiverr' && <FiverrIcon className="size-4" />}
-                    {item.externalType === 'discord' && <DiscordIcon className="size-4" />}
-                    {item.externalType === 'github' && <GithubIcon className="size-4" />}
+                    {item.externalType === 'fiverr' && <FiverrIcon className="size-3.5" />}
+                    {item.externalType === 'discord' && <DiscordIcon className="size-3.5" />}
+                    {item.externalType === 'github' && <GithubIcon className="size-3.5" />}
                     <span>
                       {item.externalLabel ||
                         (item.externalType === 'fiverr'
@@ -204,9 +223,9 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                     href={item.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-white transition-colors cursor-pointer"
                   >
-                    <GithubIcon className="size-4" />
+                    <GithubIcon className="size-3.5" />
                     <span>GitHub</span>
                     <OpenInNewIcon className="size-3 text-zinc-400" />
                   </a>
@@ -216,10 +235,10 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
               <a
                 href="#contact"
                 onClick={onClose}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-zinc-950 hover:bg-zinc-200 text-xs font-bold transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-white text-zinc-950 hover:bg-zinc-200 text-xs font-bold transition-colors cursor-pointer"
               >
-                <MailIcon className="size-4" />
-                <span>Discuss Project</span>
+                <MailIcon className="size-3.5" />
+                <span>Discuss</span>
               </a>
             </div>
           </motion.div>
