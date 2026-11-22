@@ -1,70 +1,58 @@
-# Faarrel — Personal Portfolio
+# Faarrel: Personal Portfolio
 
-A personal creative portfolio showcasing selected works across graphic design, character puppet animation, Discord community architecture, and web development.
+The personal website and work archive of Faarrel, featuring 2D character puppet animation, Discord server infrastructure, and web applications.
 
-> **Project Notice**: This repository is strictly a **personal portfolio site** to present creative projects and engineering work by Faarrel. It is not intended as a public template, library, or SaaS product.
-
----
-
-## Overview
-
-Faarrel operates across visual creativity and software engineering:
-- **Character Animation & Motion Design**: 2D puppet rigging, layer separation, ambient particle compositing, and kinetic video reels in After Effects and Photoshop.
-- **Discord Infrastructure & Bots**: Custom bots built with `discord.js` and `discord.py`, Redis caching, moderation state machines, and community architecture for servers with 45k+ members.
-- **Frontend Development**: Minimalist, high-performance web interfaces built with Next.js, React, and TypeScript.
+> **Notice:** This repository contains the source code for my personal portfolio website. It is not intended as a template, starter kit, or reusable library.
 
 ---
 
-## Tech Stack
+## What I Do
 
-This portfolio website is built with:
+- **2D Animation & Video:** Character puppet rigging, PSD layer separation, loop cycles, and video edits created in After Effects and Photoshop.
+- **Discord Engineering:** Custom bots written in `discord.js` and `discord.py`, Redis cache layers, verification flows, and server architecture managing communities with up to 45,000 members.
+- **Web Development:** Responsive frontend applications built with Next.js, React, and TypeScript.
 
-| Layer | Technology |
+---
+
+## Built With
+
+| Layer | Tool |
 |---|---|
-| **Framework** | Next.js 16 (App Router, Turbopack) |
-| **Library** | React 19 |
-| **Language** | TypeScript 5 |
-| **Styling** | Tailwind CSS v4 |
-| **Animation & Motion** | Framer Motion, GSAP |
-| **Smooth Scrolling** | Lenis |
-| **Icons & Typography** | Lucide React, Montserrat, Planet Kosmos |
+| Framework | Next.js 16 (App Router) |
+| Library | React 19 |
+| Language | TypeScript 5 |
+| Styling | Tailwind CSS v4 |
+| Motion | Framer Motion, GSAP |
+| Scroll | Lenis |
+| Fonts | Montserrat, Planet Kosmos |
 
 ---
 
-## Running Locally
+## Local Setup
 
-To run this portfolio locally:
+Clone and run locally:
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/Faarrel/Portfolio.git
-   cd Portfolio
-   ```
+```bash
+git clone https://github.com/Faarrel/Portfolio.git
+cd Portfolio
+npm install
+npm run dev
+```
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
-
-3. **Start the development server**:
-   ```bash
-   npm run dev
-   ```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## Connect
+## Contact
 
-- **Discord**: [@faarrel](https://discord.com/users/938045579215380510)
-- **GitHub**: [github.com/Faarrel](https://github.com/Faarrel)
-- **Instagram**: [@fxrrel_](https://www.instagram.com/fxrrel_/)
-- **Fiverr**: [fiverr.com/faarrel](https://www.fiverr.com/faarrel)
-- **Email**: `muhammadfarrelyf@gmail.com`
+- Discord: [@faarrel](https://discord.com/users/938045579215380510)
+- GitHub: [Faarrel](https://github.com/Faarrel)
+- Instagram: [@fxrrel_](https://www.instagram.com/fxrrel_/)
+- Fiverr: [faarrel](https://www.fiverr.com/faarrel)
+- Email: muhammadfarrelyf@gmail.com
 
 ---
 
-## License & Copyright
+## Copyright
 
-All design assets, project media, brand illustrations, and animations displayed within this portfolio are the intellectual property of **Faarrel** and the respective commission clients. All rights reserved.
+All character artwork, project media, and animations shown on this site belong to Faarrel and the respective commission clients. All rights reserved.
