@@ -1,11 +1,10 @@
 "use client";
 
-import React, { ElementType, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
-export interface BreathingTextProps extends React.HTMLAttributes<HTMLElement> {
+export interface BreathingTextProps extends React.HTMLAttributes<HTMLSpanElement> {
   children: string;
-  as?: ElementType;
   fromWeight?: number;
   toWeight?: number;
   duration?: number;
@@ -14,7 +13,6 @@ export interface BreathingTextProps extends React.HTMLAttributes<HTMLElement> {
 
 export const BreathingText = ({
   children,
-  as = "span",
   fromWeight = 100,
   toWeight = 900,
   duration = 2.0,
@@ -22,7 +20,7 @@ export const BreathingText = ({
   className,
   ...props
 }: BreathingTextProps) => {
-  const containerRef = useRef<HTMLElement | null>(null);
+  const containerRef = useRef<HTMLSpanElement | null>(null);
   const [isInView, setIsInView] = useState(true);
 
   useEffect(() => {
@@ -41,11 +39,10 @@ export const BreathingText = ({
   }, []);
 
   const letters = String(children).split("");
-  const ElementTag = as;
 
   return (
-    <ElementTag
-      ref={containerRef as any}
+    <span
+      ref={containerRef}
       className={cn(
         "breathing-text-root relative inline-block select-none after:invisible after:h-0 after:block after:content-[attr(data-text)] after:font-black after:pointer-events-none after:overflow-hidden after:select-none",
         !isInView && "breathing-text-paused",
@@ -99,7 +96,7 @@ export const BreathingText = ({
         </span>
       ))}
       <span className="sr-only">{children}</span>
-    </ElementTag>
+    </span>
   );
 };
 

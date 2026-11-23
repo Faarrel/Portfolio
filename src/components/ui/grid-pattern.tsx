@@ -3,7 +3,6 @@
 import {
   type ComponentProps,
   type CSSProperties,
-  type PointerEvent,
   useEffect,
   useRef,
 } from "react";

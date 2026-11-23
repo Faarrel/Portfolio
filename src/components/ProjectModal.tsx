@@ -171,13 +171,13 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
     const originalHtmlOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
-    (window as any).__lenis?.stop();
+    window.__lenis?.stop();
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       document.body.style.overflow = originalBodyOverflow;
       document.documentElement.style.overflow = originalHtmlOverflow;
-      (window as any).__lenis?.start();
+      window.__lenis?.start();
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [item, onClose, activeLightboxIndex, galleryList.length]);

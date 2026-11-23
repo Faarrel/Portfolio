@@ -1,13 +1,12 @@
-// Built using Hyperiux Vault: https://vault.hyperiux.com
 "use client";
 
 import gsap from "gsap";
-import type { MouseEvent, ReactNode } from "react";
-import { useEffect, useRef, useState, type RefObject } from "react";
+import type { MouseEvent, RefObject } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 /* ------------------------------------------------------------------ *
- * Inlined from ./useFocusTrap — keeps keyboard focus inside a container
- * while it's open, restores it to the trigger on close.
+ * Inlined focus trap — keeps keyboard focus inside container
+ * while open, restores to trigger on close.
  * ------------------------------------------------------------------ */
 
 const FOCUSABLE_SELECTOR = [
@@ -38,12 +37,12 @@ interface UseFocusTrapParams {
   onEscape?: () => void;
 }
 
-/**
- * Keeps keyboard focus inside `containerRef` while `active` is true.
- */
 function useFocusTrap({ active, containerRef, initialFocusRef, onEscape }: UseFocusTrapParams) {
   const onEscapeRef = useRef(onEscape);
-  onEscapeRef.current = onEscape;
+
+  useEffect(() => {
+    onEscapeRef.current = onEscape;
+  }, [onEscape]);
 
   useEffect(() => {
     if (!active) return;
@@ -113,85 +112,47 @@ function useFocusTrap({ active, containerRef, initialFocusRef, onEscape }: UseFo
  * FullscreenNav — the clip-path reveal shell
  * ------------------------------------------------------------------ */
 
-const CLIPS = {
-  bottom: {
-    closedInitial: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
-    open: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-    closedFinal: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)",
-  },
-  top: {
-    closedInitial: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)",
-    open: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-    closedFinal: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
-  },
-  left: {
-    closedInitial: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)",
-    open: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-    closedFinal: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)",
-  },
-  right: {
-    closedInitial: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)",
-    open: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-    closedFinal: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)",
-  },
-};
-
 const REDUCED_MOTION_FADE_DURATION = 0.2;
 
-export interface FullscreenNavLink {
+export interface NavLinkItem {
   label: string;
   href: string;
 }
 
 export interface FullscreenNavProps {
-  links?: FullscreenNavLink[];
+  links?: NavLinkItem[];
   brand?: string;
   brandHref?: string;
-  clipOrigin?: keyof typeof CLIPS;
   overlayBg?: string;
-  linkColor?: string;
-  linkHoverColor?: string;
-  linkSizeClass?: string;
   headerClassName?: string;
-  openDuration?: number;
-  closeDuration?: number;
-  ease?: string;
   headerOpenColor?: string;
   onOpen?: () => void;
   onClose?: () => void;
-  children?: (isOpen: boolean, closeMenu: () => void) => ReactNode;
 }
 
 function FullscreenNav({
-  links,
+  links = [
+    { label: "Home", href: "#hero" },
+    { label: "Identity & Craft", href: "#work" },
+    { label: "Let's Talk", href: "#contact" },
+  ],
   brand = "FAARREL",
   brandHref = "/",
-  clipOrigin = "bottom",
   overlayBg = "#121212",
-  linkColor = "#E0E0E0",
-  linkHoverColor = "#888888",
-  linkSizeClass = "text-5xl",
   headerClassName = "",
-  openDuration = 1.1,
-  closeDuration = 1.0,
-  ease = "power4.inOut",
   headerOpenColor = "#E0E0E0",
   onOpen,
   onClose,
-  children,
 }: FullscreenNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const overlayRef = useRef<HTMLElement | null>(null);
   const linksWrapperRef = useRef<HTMLDivElement | null>(null);
   const timelineRef = useRef<gsap.core.Timeline | gsap.core.Tween | null>(null);
-  const isAnimatingRef = useRef(false);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const toggleButtonRef = useRef<HTMLButtonElement | null>(null);
-  const reduceMotion = () =>
-    typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
 
-  const { closedInitial, open: openClipPath, closedFinal } = CLIPS[clipOrigin] ?? CLIPS.bottom;
-  const isReducedMotion = reduceMotion();
+  const isReducedMotion =
+    typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
 
   const onOpenMenu = () => {
     setIsOpen(true);
@@ -207,11 +168,7 @@ function FullscreenNav({
         autoAlpha: 1,
         duration: REDUCED_MOTION_FADE_DURATION,
         ease: "power2.out",
-        onStart: () => {
-          isAnimatingRef.current = true;
-        },
         onComplete: () => {
-          isAnimatingRef.current = false;
           onOpen?.();
         },
       });
@@ -219,11 +176,7 @@ function FullscreenNav({
     }
 
     const timeline = gsap.timeline({
-      onStart: () => {
-        isAnimatingRef.current = true;
-      },
       onComplete: () => {
-        isAnimatingRef.current = false;
         onOpen?.();
       },
     });
@@ -248,21 +201,17 @@ function FullscreenNav({
       );
   };
 
-  const onCloseMenu = () => {
+  const onCloseMenu = useCallback(() => {
     timelineRef.current?.kill();
     document.body.style.overflow = "";
-    (window as any).__lenis?.start();
+    window.__lenis?.start();
 
     if (isReducedMotion) {
       timelineRef.current = gsap.to(overlayRef.current, {
         autoAlpha: 0,
         duration: REDUCED_MOTION_FADE_DURATION,
         ease: "power2.out",
-        onStart: () => {
-          isAnimatingRef.current = true;
-        },
         onComplete: () => {
-          isAnimatingRef.current = false;
           setIsOpen(false);
           gsap.set(overlayRef.current, { clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)" });
           onClose?.();
@@ -272,11 +221,7 @@ function FullscreenNav({
     }
 
     const timeline = gsap.timeline({
-      onStart: () => {
-        isAnimatingRef.current = true;
-      },
       onComplete: () => {
-        isAnimatingRef.current = false;
         setIsOpen(false);
         gsap.set(overlayRef.current, { clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)" });
         onClose?.();
@@ -285,7 +230,6 @@ function FullscreenNav({
 
     timelineRef.current = timeline;
 
-    // Smoothly pulls content UP (-y) and pulls the overlay UP back to the top
     timeline
       .to(linksWrapperRef.current, {
         y: -40,
@@ -302,7 +246,7 @@ function FullscreenNav({
         },
         "-=0.15"
       );
-  };
+  }, [isReducedMotion, onClose]);
 
   const onToggleMenu = () => {
     if (isOpen) {
@@ -312,25 +256,17 @@ function FullscreenNav({
     onOpenMenu();
   };
 
-  const onLinkMouseEnter = (event: MouseEvent<HTMLAnchorElement>) => {
-    event.currentTarget.style.color = linkHoverColor;
-  };
-
-  const onLinkMouseLeave = (event: MouseEvent<HTMLAnchorElement>) => {
-    event.currentTarget.style.color = linkColor;
-  };
-
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      (window as any).__lenis?.stop();
+      window.__lenis?.stop();
     } else {
       document.body.style.overflow = "";
-      (window as any).__lenis?.start();
+      window.__lenis?.start();
     }
     return () => {
       document.body.style.overflow = "";
-      (window as any).__lenis?.start();
+      window.__lenis?.start();
     };
   }, [isOpen]);
 
@@ -346,7 +282,7 @@ function FullscreenNav({
               e.preventDefault();
               onCloseMenu();
             }
-            const lenis = (window as any).__lenis;
+            const lenis = window.__lenis;
             if (lenis) {
               lenis.start();
               lenis.scrollTo(0);
@@ -398,7 +334,7 @@ function FullscreenNav({
 
       <nav
         ref={overlayRef}
-        style={{ clipPath: closedInitial, backgroundColor: overlayBg }}
+        style={{ clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)", backgroundColor: overlayBg }}
         className={`fixed inset-0 z-60 flex flex-col items-center justify-center gap-2 overflow-y-auto ${
           isOpen ? "pointer-events-auto visible" : "pointer-events-none invisible"
         }`}
@@ -406,22 +342,7 @@ function FullscreenNav({
         role="navigation"
       >
         <div ref={linksWrapperRef} className="flex min-h-screen w-screen flex-col items-center justify-center motion-reduce:opacity-100">
-          {children
-            ? children(isOpen, onCloseMenu)
-            : (links as FullscreenNavLink[]).map(({ label, href }) => (
-                <a
-                  key={label}
-                  href={href}
-                  onClick={isOpen ? onCloseMenu : undefined}
-                  tabIndex={isOpen ? 0 : -1}
-                  style={{ color: linkColor }}
-                  onMouseEnter={onLinkMouseEnter}
-                  onMouseLeave={onLinkMouseLeave}
-                  className={`${linkSizeClass} font-normal tracking-tight transition-colors motion-reduce:transition-none`}
-                >
-                  {label}
-                </a>
-              ))}
+          <CustomNavbar links={links} isOpen={isOpen} onClose={onCloseMenu} overlayBg={overlayBg} />
         </div>
       </nav>
     </div>
@@ -429,55 +350,14 @@ function FullscreenNav({
 }
 
 /* ------------------------------------------------------------------ *
- * CustomNavbar — Panel layout
+ * CustomNavbar & NavLinkHover
  * ------------------------------------------------------------------ */
-
-const SOCIAL_ICONS: Record<string, ReactNode> = {
-  discord: (
-    <span className="text-xs tracking-wider uppercase px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/80 text-zinc-200 hover:text-white transition-colors">
-      Discord
-    </span>
-  ),
-  github: (
-    <span className="text-xs tracking-wider uppercase px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/80 text-zinc-200 hover:text-white transition-colors">
-      GitHub
-    </span>
-  ),
-  instagram: (
-    <span className="text-xs tracking-wider uppercase px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/80 text-zinc-200 hover:text-white transition-colors">
-      Instagram
-    </span>
-  ),
-  fiverr: (
-    <span className="text-xs tracking-wider uppercase px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/80 text-zinc-200 hover:text-white transition-colors">
-      Fiverr
-    </span>
-  ),
-  email: (
-    <span className="text-xs tracking-wider uppercase px-3 py-1.5 rounded-full border border-zinc-700 bg-zinc-800/80 text-zinc-200 hover:text-white transition-colors">
-      Email
-    </span>
-  ),
-};
 
 const DEFAULT_LINK_Y_OFFSET = 25;
 const DEFAULT_LINK_DURATION = 0.7;
 const DEFAULT_LINK_STAGGER = 0.06;
 const DEFAULT_LINK_CHAR_STAGGER = 0.015;
-const IMAGE_INITIAL_SCALE = 0.85;
-const DEFAULT_IMAGE_START_SCALE = 0.9;
-const DEFAULT_IMAGE_DURATION = 0.8;
-const DEFAULT_IMAGE_STAGGER = 0.03;
-const DEFAULT_SOCIAL_Y_OFFSET = 12;
-const DEFAULT_SOCIAL_DURATION = 0.5;
-const DEFAULT_SOCIAL_STAGGER = 0.05;
-const HEADER_Y_OFFSET = -10;
-const LOCATION_Y_OFFSET = 8;
 const DELAY_OFFSET = 0.15;
-const TAGLINE_DELAY_OFFSET = 0.06;
-const IMAGE_DELAY_OFFSET = 0.1;
-const SOCIAL_DELAY_OFFSET = 0.18;
-const LOCATION_DELAY_OFFSET = 0.22;
 
 function NavLinkHover({
   label,
@@ -492,12 +372,12 @@ function NavLinkHover({
   reduced: boolean;
   onClick?: () => void;
 }) {
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
 
     // 1. Immediately unlock body scroll & resume Lenis
     document.body.style.overflow = "";
-    const lenis = (window as any).__lenis;
+    const lenis = window.__lenis;
     if (lenis) {
       lenis.start();
     }
@@ -524,7 +404,6 @@ function NavLinkHover({
       }
     };
 
-    // Run immediately and reinforce after 250ms as overlay transitions away
     executeScroll();
     setTimeout(executeScroll, 250);
   };
@@ -555,109 +434,37 @@ function NavLinkHover({
   );
 }
 
-export interface CustomNavbarLink {
-  label: string;
-  href: string;
-}
-
-export interface CustomNavbarSocial {
-  type: string;
-  href: string;
-}
-
-export interface CustomNavbarProps {
-  links?: CustomNavbarLink[];
-  images?: string[];
-  agencyName?: string;
-  socials?: CustomNavbarSocial[];
-  location?: string;
-  tagline?: string;
+interface CustomNavbarProps {
+  links: NavLinkItem[];
   isOpen?: boolean;
   onClose?: () => void;
   overlayBg?: string;
   delay?: number;
-  linkOffsetY?: number;
-  linkDuration?: number;
-  linkStagger?: number;
-  linkCharStagger?: number;
-  imageStartScale?: number;
-  imageDuration?: number;
-  imageStagger?: number;
-  socialOffsetY?: number;
-  socialDuration?: number;
-  socialStagger?: number;
 }
 
 function CustomNavbar({
-  links = [
-    { label: "Home", href: "#hero" },
-    { label: "Identity & Craft", href: "#work" },
-    { label: "Let's Talk", href: "#contact" },
-  ],
-  images = [],
-  agencyName = "FAARREL",
-  socials = [],
-  location = "Indonesia",
-  tagline = "Graphic Designer · Character Animator · Fullstack Developer",
+  links,
   isOpen = false,
   onClose,
   overlayBg = "#09090b",
   delay = 0.8,
-  linkOffsetY = DEFAULT_LINK_Y_OFFSET,
-  linkDuration = DEFAULT_LINK_DURATION,
-  linkStagger = DEFAULT_LINK_STAGGER,
-  linkCharStagger = DEFAULT_LINK_CHAR_STAGGER,
-  imageStartScale = DEFAULT_IMAGE_START_SCALE,
-  imageDuration = DEFAULT_IMAGE_DURATION,
-  imageStagger = DEFAULT_IMAGE_STAGGER,
-  socialOffsetY = DEFAULT_SOCIAL_Y_OFFSET,
-  socialDuration = DEFAULT_SOCIAL_DURATION,
-  socialStagger = DEFAULT_SOCIAL_STAGGER,
 }: CustomNavbarProps) {
   const linksRef = useRef<(HTMLDivElement | null)[]>([]);
-  const imagesRef = useRef<(HTMLDivElement | null)[]>([]);
-  const socialsRef = useRef<(HTMLAnchorElement | null)[]>([]);
-  const agencyRef = useRef<HTMLHeadingElement | null>(null);
-  const taglineRef = useRef<HTMLParagraphElement | null>(null);
-  const locationRef = useRef<HTMLSpanElement | null>(null);
-  const reduceMotion = () =>
+  const isReducedMotion =
     typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches === true;
-  const isReducedMotion = reduceMotion();
 
   const killAllTweens = () => {
-    const targets = [
-      ...linksRef.current,
-      ...imagesRef.current,
-      ...socialsRef.current,
-      agencyRef.current,
-      taglineRef.current,
-      locationRef.current,
-    ].filter(Boolean);
+    const targets = linksRef.current.filter(Boolean);
     if (targets.length) gsap.killTweensOf(targets);
   };
 
-  const resetAnimatedElements = () => {
+  const resetAnimatedElements = useCallback(() => {
     const validLinks = linksRef.current.filter(Boolean);
-    const validImages = imagesRef.current.filter(Boolean);
-    const validSocials = socialsRef.current.filter(Boolean);
-    if (validLinks.length) gsap.set(validLinks, { y: linkOffsetY, opacity: 0 });
-    if (validImages.length) gsap.set(validImages, { scale: IMAGE_INITIAL_SCALE, opacity: 0 });
-    if (validSocials.length) gsap.set(validSocials, { y: socialOffsetY, opacity: 0 });
-    if (agencyRef.current) gsap.set(agencyRef.current, { y: HEADER_Y_OFFSET, opacity: 0 });
-    if (taglineRef.current) gsap.set(taglineRef.current, { y: HEADER_Y_OFFSET, opacity: 0 });
-    if (locationRef.current) gsap.set(locationRef.current, { y: LOCATION_Y_OFFSET, opacity: 0 });
-  };
+    if (validLinks.length) gsap.set(validLinks, { y: DEFAULT_LINK_Y_OFFSET, opacity: 0 });
+  }, []);
 
   const setLinkRef = (index: number) => (element: HTMLDivElement | null) => {
     linksRef.current[index] = element;
-  };
-
-  const setImageRef = (index: number) => (element: HTMLDivElement | null) => {
-    imagesRef.current[index] = element;
-  };
-
-  const setSocialRef = (index: number) => (element: HTMLAnchorElement | null) => {
-    socialsRef.current[index] = element;
   };
 
   useEffect(() => {
@@ -667,7 +474,7 @@ function CustomNavbar({
 
     resetAnimatedElements();
 
-    if (reduceMotion()) {
+    if (isReducedMotion) {
       gsap.set(linksRef.current, { y: 0, opacity: 1 });
       return;
     }
@@ -676,10 +483,17 @@ function CustomNavbar({
 
     gsap.fromTo(
       linksRef.current,
-      { y: linkOffsetY, opacity: 0 },
-      { y: 0, opacity: 1, duration: linkDuration, ease: "power2.out", stagger: linkStagger, delay: animationDelay },
+      { y: DEFAULT_LINK_Y_OFFSET, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: DEFAULT_LINK_DURATION,
+        ease: "power2.out",
+        stagger: DEFAULT_LINK_STAGGER,
+        delay: animationDelay,
+      }
     );
-  }, [delay, isOpen, linkDuration, linkOffsetY, linkStagger]);
+  }, [delay, isOpen, isReducedMotion, resetAnimatedElements]);
 
   return (
     <div
@@ -692,12 +506,12 @@ function CustomNavbar({
             key={link.label}
             ref={setLinkRef(index)}
             className="z-60 text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white hover:text-zinc-300 transition-colors"
-            style={{ opacity: 0, transform: `translateY(${linkOffsetY}px)` }}
+            style={{ opacity: 0, transform: `translateY(${DEFAULT_LINK_Y_OFFSET}px)` }}
           >
             <NavLinkHover
               label={link.label}
               href={link.href}
-              charStagger={linkCharStagger}
+              charStagger={DEFAULT_LINK_CHAR_STAGGER}
               reduced={isReducedMotion}
               onClick={onClose}
             />
@@ -708,88 +522,18 @@ function CustomNavbar({
   );
 }
 
-/* ------------------------------------------------------------------ */
-
-const NAV_CONFIG: Partial<FullscreenNavProps> = {
-  brand: "FAARREL",
-  brandHref: "/",
-  clipOrigin: "top",
-  overlayBg: "#121212",
-  headerOpenColor: "#E0E0E0",
-  linkColor: "#E0E0E0",
-  linkHoverColor: "#888888",
-  openDuration: 0.9,
-  closeDuration: 0.8,
-};
-
-const NAV_CONTENT: Partial<CustomNavbarProps> = {
-  agencyName: "FAARREL",
-  tagline: "Graphic Designer · Character Animator · Discord Architect · Fullstack Developer",
-  location: "Indonesia",
-  links: [
-    { label: "Home", href: "#hero" },
-    { label: "Identity & Craft", href: "#work" },
-    { label: "Let's Talk", href: "#contact" },
-  ],
-  images: [],
-  socials: [],
-};
+/* ------------------------------------------------------------------ *
+ * Default Export
+ * ------------------------------------------------------------------ */
 
 export interface ImmersiveFullscreenNavProps {
-  navConfig?: Partial<FullscreenNavProps>;
-  navContent?: Partial<CustomNavbarProps>;
+  brand?: string;
+  brandHref?: string;
+  links?: NavLinkItem[];
   overlayBg?: string;
-  headerOpenColor?: string;
-  linkColor?: string;
-  linkHoverColor?: string;
-  ease?: string;
-  clipOrigin?: "top" | "bottom" | "left" | "right";
-  openDuration?: number;
-  closeDuration?: number;
-  linkDuration?: number;
-  linkStagger?: number;
-  linkCharStagger?: number;
-  linkOffsetY?: number;
-  imageDuration?: number;
-  imageStagger?: number;
-  imageStartScale?: number;
-  socialDuration?: number;
-  socialStagger?: number;
-  socialOffsetY?: number;
+  headerClassName?: string;
 }
 
-export default function ImmersiveFullscreenNav({ navConfig = NAV_CONFIG, navContent = NAV_CONTENT, ...props }: ImmersiveFullscreenNavProps) {
-  const config = {
-    ...NAV_CONFIG,
-    ...navConfig,
-    ...(props.overlayBg !== undefined ? { overlayBg: props.overlayBg } : {}),
-    ...(props.headerOpenColor !== undefined ? { headerOpenColor: props.headerOpenColor } : {}),
-    ...(props.linkColor !== undefined ? { linkColor: props.linkColor } : {}),
-    ...(props.linkHoverColor !== undefined ? { linkHoverColor: props.linkHoverColor } : {}),
-    ...(props.ease !== undefined ? { ease: props.ease } : {}),
-    ...(props.clipOrigin !== undefined ? { clipOrigin: props.clipOrigin } : {}),
-    ...(props.openDuration !== undefined ? { openDuration: props.openDuration } : {}),
-    ...(props.closeDuration !== undefined ? { closeDuration: props.closeDuration } : {}),
-  };
-
-  const content = {
-    ...NAV_CONTENT,
-    ...navContent,
-    ...(props.linkDuration !== undefined ? { linkDuration: props.linkDuration } : {}),
-    ...(props.linkStagger !== undefined ? { linkStagger: props.linkStagger } : {}),
-    ...(props.linkCharStagger !== undefined ? { linkCharStagger: props.linkCharStagger } : {}),
-    ...(props.linkOffsetY !== undefined ? { linkOffsetY: props.linkOffsetY } : {}),
-    ...(props.imageDuration !== undefined ? { imageDuration: props.imageDuration } : {}),
-    ...(props.imageStagger !== undefined ? { imageStagger: props.imageStagger } : {}),
-    ...(props.imageStartScale !== undefined ? { imageStartScale: props.imageStartScale } : {}),
-    ...(props.socialDuration !== undefined ? { socialDuration: props.socialDuration } : {}),
-    ...(props.socialStagger !== undefined ? { socialStagger: props.socialStagger } : {}),
-    ...(props.socialOffsetY !== undefined ? { socialOffsetY: props.socialOffsetY } : {}),
-  };
-
-  return (
-    <FullscreenNav {...config}>
-      {(isOpen, onCloseMenu) => <CustomNavbar {...content} isOpen={isOpen} onClose={onCloseMenu} overlayBg={config.overlayBg} delay={config.openDuration} />}
-    </FullscreenNav>
-  );
+export default function ImmersiveFullscreenNav(props: ImmersiveFullscreenNavProps) {
+  return <FullscreenNav {...props} />;
 }
