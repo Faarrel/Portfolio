@@ -332,7 +332,7 @@ export default function DiscordPresenceCard() {
       </div>
 
       {/* Integrated Activity Section (Monochrome & Official Dual-Icon) */}
-      {(primaryActivity || spotify || (!primaryActivity && !spotify)) && (
+      {(primaryActivity || spotify) && (
         <div className="pt-3.5 border-t border-white/[0.08] flex flex-col gap-3">
           {/* 1. Playing / Working in App (Orca / VS Code / Games) */}
           {primaryActivity && (
@@ -435,18 +435,6 @@ export default function DiscordPresenceCard() {
                 </div>
               </div>
             </a>
-          )}
-
-          {/* 3. Fallback when neither game/app nor spotify is active */}
-          {!primaryActivity && !spotify && (
-            <div className="flex items-center justify-between text-xs text-zinc-400">
-              <span className="font-medium text-zinc-300">
-                {customStatusText || 'Currently idle & creating'}
-              </span>
-              <span className="text-xs text-zinc-500 font-mono">
-                ID: {DISCORD_USER_ID.slice(0, 6)}...
-              </span>
-            </div>
           )}
         </div>
       )}

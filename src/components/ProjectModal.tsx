@@ -91,7 +91,6 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
 
   const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const contentRef = useRef<HTMLDivElement>(null);
-  const overlayRef = useRef<HTMLDivElement>(null);
 
   // Focus scroll container on open for immediate keyboard scrolling
   useEffect(() => {
@@ -100,21 +99,10 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
     }
   }, [item]);
 
-  // Forward wheel scrolling from header/footer/card padding to scrollable content
-  const handleCardWheel = (e: React.WheelEvent) => {
+  // Forward wheel scrolling from anywhere (backdrop, header, footer) to modal content
+  const handleWheel = (e: React.WheelEvent) => {
     if (activeLightboxIndex !== null || !contentRef.current) return;
     if (!contentRef.current.contains(e.target as Node)) {
-      contentRef.current.scrollTop += e.deltaY;
-    }
-  };
-
-  // Forward wheel scrolling from backdrop or outer margins to scrollable content
-  const handleOverlayWheel = (e: React.WheelEvent) => {
-    if (activeLightboxIndex !== null || !contentRef.current) return;
-    if (
-      e.target === e.currentTarget ||
-      (e.target as HTMLElement)?.classList?.contains('backdrop-blur-md')
-    ) {
       contentRef.current.scrollTop += e.deltaY;
     }
   };
@@ -130,7 +118,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
     }
   }, [activeLightboxIndex]);
 
-  // Keyboard navigation & lock body scroll
+  // Keyboard navigation & lock body + html scroll so background website NEVER scrolls
   useEffect(() => {
     if (!item) return;
 
@@ -154,12 +142,15 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
       }
     };
 
-    const originalOverflow = document.body.style.overflow;
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.body.style.overflow = originalOverflow;
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [item, onClose, activeLightboxIndex, galleryList.length]);
@@ -168,9 +159,8 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
     <AnimatePresence>
       {item && (
         <div
-          ref={overlayRef}
-          onWheel={handleOverlayWheel}
-          className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain [scrollbar-width:thin] [scrollbar-color:#3f3f46_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-600/60 hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500 [&::-webkit-scrollbar-thumb]:rounded-full"
+          onWheel={handleWheel}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 md:p-6 overflow-hidden"
         >
           {/* Backdrop with frosted dark blur */}
           <motion.div
@@ -179,20 +169,17 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/85 backdrop-blur-md cursor-pointer -z-10"
+            className="fixed inset-0 bg-black/85 backdrop-blur-md cursor-pointer"
           />
 
-          {/* Centering Layout Container */}
-          <div className="min-h-full w-full flex items-center justify-center p-3 sm:p-5 md:p-6 py-6 sm:py-8 pointer-events-none">
-            {/* Modal Dialog Card */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96, y: 16 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: 16 }}
-              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-              onWheel={handleCardWheel}
-              className="relative w-full max-w-lg sm:max-w-xl md:max-w-2xl max-h-[85vh] sm:max-h-[88vh] bg-[#161618] border border-[#27272a] rounded-[22px] sm:rounded-[24px] shadow-2xl z-10 flex flex-col overflow-hidden pointer-events-auto my-auto"
-            >
+          {/* Modal Dialog Card */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 16 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            className="relative w-full max-w-lg sm:max-w-xl md:max-w-2xl max-h-[85vh] sm:max-h-[88vh] bg-[#161618] border border-[#27272a] rounded-[22px] sm:rounded-[24px] shadow-2xl z-10 flex flex-col overflow-hidden my-auto"
+          >
               {/* Header: Clean, refined top bar without clunky badges */}
               <div className="shrink-0 bg-[#161618] px-4 sm:px-6 py-3.5 border-b border-white/[0.08] flex items-center justify-between">
                 <div className="flex items-center gap-2 min-w-0">
@@ -215,9 +202,9 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
               <div
                 ref={contentRef}
                 tabIndex={0}
-                className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4 focus:outline-none [scrollbar-width:thin] [scrollbar-color:#52525b_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-white/[0.02] [&::-webkit-scrollbar-thumb]:bg-zinc-600/70 hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500 [&::-webkit-scrollbar-thumb]:rounded-full"
+                className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-4 focus:outline-none [scrollbar-width:thin] [scrollbar-color:#52525b_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-white/[0.02] [&::-webkit-scrollbar-thumb]:bg-zinc-600/70 hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500 [&::-webkit-scrollbar-thumb]:rounded-full"
               >
-              {/* Title & Metadata */}
+                {/* Title & Metadata */}
               <div>
                 <h3 className="text-lg sm:text-xl font-bold tracking-tight text-white leading-tight">
                   {item.title}
@@ -431,7 +418,6 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
               </div>
             </div>
           </motion.div>
-          </div>
 
           {/* Discord-Style Fullscreen Lightbox Preview */}
           <AnimatePresence>
