@@ -90,6 +90,34 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
     : [];
 
   const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+
+  // Focus scroll container on open for immediate keyboard scrolling
+  useEffect(() => {
+    if (item && contentRef.current) {
+      contentRef.current.focus({ preventScroll: true });
+    }
+  }, [item]);
+
+  // Forward wheel scrolling from header/footer/card padding to scrollable content
+  const handleCardWheel = (e: React.WheelEvent) => {
+    if (activeLightboxIndex !== null || !contentRef.current) return;
+    if (!contentRef.current.contains(e.target as Node)) {
+      contentRef.current.scrollTop += e.deltaY;
+    }
+  };
+
+  // Forward wheel scrolling from backdrop or outer margins to scrollable content
+  const handleOverlayWheel = (e: React.WheelEvent) => {
+    if (activeLightboxIndex !== null || !contentRef.current) return;
+    if (
+      e.target === e.currentTarget ||
+      (e.target as HTMLElement)?.classList?.contains('backdrop-blur-md')
+    ) {
+      contentRef.current.scrollTop += e.deltaY;
+    }
+  };
 
   // Scroll active thumbnail smoothly into view when lightbox index changes
   useEffect(() => {
@@ -139,7 +167,11 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
   return (
     <AnimatePresence>
       {item && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 md:p-6 overflow-hidden">
+        <div
+          ref={overlayRef}
+          onWheel={handleOverlayWheel}
+          className="fixed inset-0 z-[100] overflow-y-auto overscroll-contain [scrollbar-width:thin] [scrollbar-color:#3f3f46_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:bg-zinc-600/60 hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500 [&::-webkit-scrollbar-thumb]:rounded-full"
+        >
           {/* Backdrop with frosted dark blur */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -147,37 +179,44 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/85 backdrop-blur-md cursor-pointer"
+            className="fixed inset-0 bg-black/85 backdrop-blur-md cursor-pointer -z-10"
           />
 
-          {/* Modal Dialog Card */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 16 }}
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full max-w-lg sm:max-w-xl md:max-w-2xl max-h-[88vh] max-h-[88dvh] bg-[#161618] border border-[#27272a] rounded-[22px] sm:rounded-[24px] shadow-2xl z-10 flex flex-col overflow-hidden my-auto"
-          >
-            {/* Header: Clean, refined top bar without clunky badges */}
-            <div className="shrink-0 bg-[#161618] px-4 sm:px-6 py-3.5 border-b border-white/[0.08] flex items-center justify-between">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-widest text-zinc-400">
-                  {item.categoryLabel || 'Showcase'}
-                </span>
+          {/* Centering Layout Container */}
+          <div className="min-h-full w-full flex items-center justify-center p-3 sm:p-5 md:p-6 py-6 sm:py-8 pointer-events-none">
+            {/* Modal Dialog Card */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 16 }}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              onWheel={handleCardWheel}
+              className="relative w-full max-w-lg sm:max-w-xl md:max-w-2xl max-h-[85vh] sm:max-h-[88vh] bg-[#161618] border border-[#27272a] rounded-[22px] sm:rounded-[24px] shadow-2xl z-10 flex flex-col overflow-hidden pointer-events-auto my-auto"
+            >
+              {/* Header: Clean, refined top bar without clunky badges */}
+              <div className="shrink-0 bg-[#161618] px-4 sm:px-6 py-3.5 border-b border-white/[0.08] flex items-center justify-between">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-widest text-zinc-400">
+                    {item.categoryLabel || 'Showcase'}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={onClose}
+                  aria-label="Close modal"
+                  className="size-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer shrink-0 ml-2"
+                >
+                  <CloseIcon className="size-4" />
+                </button>
               </div>
 
-              <button
-                type="button"
-                onClick={onClose}
-                aria-label="Close modal"
-                className="size-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer shrink-0 ml-2"
+              {/* Scrollable Content Area: strictly constrained by min-h-0 so header/footer are never pushed */}
+              <div
+                ref={contentRef}
+                tabIndex={0}
+                className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4 focus:outline-none [scrollbar-width:thin] [scrollbar-color:#52525b_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-white/[0.02] [&::-webkit-scrollbar-thumb]:bg-zinc-600/70 hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500 [&::-webkit-scrollbar-thumb]:rounded-full"
               >
-                <CloseIcon className="size-4" />
-              </button>
-            </div>
-
-            {/* Scrollable Content Area: strictly constrained by min-h-0 so header/footer are never pushed */}
-            <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4">
               {/* Title & Metadata */}
               <div>
                 <h3 className="text-lg sm:text-xl font-bold tracking-tight text-white leading-tight">
@@ -392,6 +431,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
               </div>
             </div>
           </motion.div>
+          </div>
 
           {/* Discord-Style Fullscreen Lightbox Preview */}
           <AnimatePresence>
