@@ -53,7 +53,15 @@ interface LanyardData {
 
 const DISCORD_USER_ID = '938045579215380510';
 
-const DISCORD_BADGES = [
+interface DiscordBadge {
+  id?: string;
+  name: string;
+  desc: string;
+  src: string;
+  link?: string;
+}
+
+const DISCORD_BADGES: DiscordBadge[] = [
   {
     name: 'Gifting Legend',
     desc: 'Gifting Legend. 100 gifts given',
@@ -143,9 +151,47 @@ function getActivityAssets(activity?: LanyardActivity) {
 
 export default function DiscordPresenceCard() {
   const [lanyard, setLanyard] = useState<LanyardData | null>(null);
+  const [badges, setBadges] = useState<DiscordBadge[]>(DISCORD_BADGES);
   const [copied, setCopied] = useState(false);
   const [spotifyCurrentMs, setSpotifyCurrentMs] = useState(0);
   const [activityElapsed, setActivityElapsed] = useState('');
+
+  // Real-time Discord profile badges from dcdn.dstn.to
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchBadges() {
+      try {
+        const res = await fetch(`https://dcdn.dstn.to/profile/${DISCORD_USER_ID}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && Array.isArray(data.badges) && data.badges.length > 0) {
+          const liveBadges: DiscordBadge[] = data.badges.map(
+            (b: { id: string; description: string; icon: string; link?: string }) => ({
+              id: b.id,
+              name: b.description,
+              desc: b.description,
+              src: `https://cdn.discordapp.com/badge-icons/${b.icon}.png`,
+              link: b.link,
+            })
+          );
+          if (isMounted) {
+            setBadges(liveBadges);
+          }
+        }
+      } catch {
+        // Fallback state retained gracefully
+      }
+    }
+
+    fetchBadges();
+    const interval = setInterval(fetchBadges, 60000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -295,11 +341,11 @@ export default function DiscordPresenceCard() {
               @{PERSONAL_INFO.discordHandle} {copied && <span className="text-zinc-300 font-sans text-xs">(copied!)</span>}
             </button>
 
-            {/* Official Discord Profile Badges */}
+            {/* Official Discord Profile Badges (Real-time from dcdn / fallback) */}
             <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#18181b] border border-white/5 shrink-0">
-              {DISCORD_BADGES.map((b) => (
+              {badges.map((b) => (
                 <img
-                  key={b.name}
+                  key={b.id || b.name}
                   src={b.src}
                   alt={b.name}
                   title={b.desc}
