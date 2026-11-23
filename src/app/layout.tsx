@@ -1,11 +1,18 @@
 import type { Metadata, Viewport } from "next";
 import { Montserrat } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
   display: "swap",
+});
+
+const planetKosmos = localFont({
+  src: "../../public/fonts/planet-kosmos.ttf",
+  variable: "--font-planet-kosmos",
+  display: "block",
 });
 
 export const viewport: Viewport = {
@@ -116,10 +123,17 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${montserrat.variable} dark scroll-smooth`}
+      className={`${montserrat.variable} ${planetKosmos.variable} dark scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
+        <link
+          rel="preload"
+          href="/fonts/planet-kosmos.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
         <link
           rel="discord:component-embed"
           type="application/json"

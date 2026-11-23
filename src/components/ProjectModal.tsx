@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Lenis from 'lenis';
 import {
   CloseIcon,
   ChevronLeftIcon,
@@ -91,61 +92,39 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
 
   const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const contentRef = useRef<HTMLDivElement>(null);
-  const targetScroll = useRef<number>(0);
-  const currentScroll = useRef<number>(0);
-  const isAnimating = useRef(false);
+  const innerRef = useRef<HTMLDivElement>(null);
 
-  // Focus scroll container on open and reset scroll position
+  // Initialize a dedicated Lenis smooth scroll engine inside the modal for buttery smooth scrolling identical to the main site
   useEffect(() => {
-    if (item && contentRef.current) {
-      contentRef.current.scrollTop = 0;
-      currentScroll.current = 0;
-      targetScroll.current = 0;
-      isAnimating.current = false;
-      contentRef.current.focus({ preventScroll: true });
+    if (!item || !contentRef.current || !innerRef.current) return;
+
+    contentRef.current.scrollTop = 0;
+
+    const modalLenis = new Lenis({
+      wrapper: contentRef.current,
+      content: innerRef.current,
+      eventsTarget: contentRef.current,
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 1,
+      touchMultiplier: 1.5,
+    });
+
+    let rafId: number;
+    function raf(time: number) {
+      modalLenis.raf(time);
+      rafId = requestAnimationFrame(raf);
     }
+    rafId = requestAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      modalLenis.destroy();
+    };
   }, [item]);
-
-  // Smooth scroll interpolation loop
-  const smoothScrollLoop = () => {
-    if (!contentRef.current) {
-      isAnimating.current = false;
-      return;
-    }
-    const diff = targetScroll.current - currentScroll.current;
-    if (Math.abs(diff) < 0.5) {
-      currentScroll.current = targetScroll.current;
-      contentRef.current.scrollTop = targetScroll.current;
-      isAnimating.current = false;
-      return;
-    }
-    currentScroll.current += diff * 0.16;
-    contentRef.current.scrollTop = currentScroll.current;
-    requestAnimationFrame(smoothScrollLoop);
-  };
-
-  // Smooth wheel scrolling ONLY when cursor is inside the modal card
-  const handleCardWheel = (e: React.WheelEvent) => {
-    if (activeLightboxIndex !== null || !contentRef.current) return;
-    e.stopPropagation();
-    e.preventDefault();
-
-    const el = contentRef.current;
-    const max = el.scrollHeight - el.clientHeight;
-    if (max <= 0) return;
-
-    if (!isAnimating.current) {
-      currentScroll.current = el.scrollTop;
-      targetScroll.current = el.scrollTop;
-    }
-
-    targetScroll.current = Math.max(0, Math.min(max, targetScroll.current + e.deltaY));
-
-    if (!isAnimating.current) {
-      isAnimating.current = true;
-      requestAnimationFrame(smoothScrollLoop);
-    }
-  };
 
   // Prevent any scrolling when cursor is outside the modal card
   const handleOuterWheel = (e: React.WheelEvent) => {
@@ -224,7 +203,6 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
           {/* Modal Dialog Card */}
           <motion.div
             data-lenis-prevent
-            onWheel={handleCardWheel}
             initial={{ opacity: 0, scale: 0.96, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 16 }}
@@ -249,13 +227,14 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                 </button>
               </div>
 
-              {/* Scrollable Content Area: clean looks without scrollbar, smooth scrolling */}
+              {/* Scrollable Content Area: clean looks without scrollbar, Lenis smooth scrolling */}
               <div
                 ref={contentRef}
                 data-lenis-prevent
                 tabIndex={0}
-                className="flex-1 min-h-0 overflow-y-auto scroll-smooth p-4 sm:p-6 space-y-4 focus:outline-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+                className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 focus:outline-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
               >
+                <div ref={innerRef} className="space-y-4">
                 {/* Title & Metadata */}
               <div>
                 <h3 className="text-lg sm:text-xl font-bold tracking-tight text-white leading-tight">
@@ -426,8 +405,9 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                 </div>
               )}
 
-              {/* Dedicated bottom spacer to ensure content and review border are never clipped */}
-              <div className="h-6 shrink-0" aria-hidden="true" />
+                {/* Dedicated bottom spacer to ensure content and review border are never clipped */}
+                <div className="h-6 shrink-0" aria-hidden="true" />
+              </div>
             </div>
 
             {/* Footer: Symmetrical, precision action bar */}

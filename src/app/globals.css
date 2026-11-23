@@ -5,11 +5,11 @@
   src: url('/fonts/planet-kosmos.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 
 .font-planet-kosmos {
-  font-family: 'Planet Kosmos', sans-serif !important;
+  font-family: var(--font-planet-kosmos), 'Planet Kosmos', sans-serif !important;
 }
 
 @theme {
