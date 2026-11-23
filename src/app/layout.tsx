@@ -33,6 +33,9 @@ export const metadata: Metadata = {
     "Next.js",
   ],
   authors: [{ name: "Faarrel" }],
+  verification: {
+    google: "x2GSOWUpnLjT_3wbfMHg6G3Ww9giV278oQ5efpaPsKU",
+  },
   openGraph: {
     title: "Faarrel | Graphic Designer, Character Animator & Fullstack Developer",
     description: "Graphic design, character animation in After Effects, Discord server builds, and fullstack engineering.",
