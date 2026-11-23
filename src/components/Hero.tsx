@@ -13,57 +13,6 @@ const DISCIPLINES = [
 export default function Hero() {
   return (
     <section id="hero" className="relative min-h-[100svh] min-h-[100dvh] flex flex-col justify-between pt-20 sm:pt-36 pb-4 sm:pb-8 px-4 sm:px-8 md:px-12 bg-transparent overflow-hidden">
-      <style>{`
-        .hero-title-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          text-align: center;
-          width: 100%;
-        }
-        .hero-title-wrapper {
-          display: inline-flex;
-          justify-content: center;
-          align-items: center;
-          text-align: center;
-          max-width: 100%;
-        }
-        .hero-title {
-          display: inline-flex !important;
-          justify-content: center !important;
-          align-items: center !important;
-          letter-spacing: -0.065em !important;
-          transform-origin: 50% 50% !important;
-          text-align: center !important;
-          margin-left: auto !important;
-          margin-right: auto !important;
-          transition: letter-spacing 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
-          cursor: pointer !important;
-        }
-        .hero-title:hover {
-          letter-spacing: -0.035em !important;
-        }
-        .marquee-container {
-          width: 100%;
-          overflow: hidden;
-          position: relative;
-        }
-        .marquee-content {
-          display: flex;
-          width: max-content;
-          animation: marquee-scroll 24s linear infinite;
-          will-change: transform;
-          transform: translate3d(0, 0, 0);
-        }
-        .marquee-content:hover {
-          animation-play-state: paused;
-        }
-        @keyframes marquee-scroll {
-          0% { transform: translate3d(0, 0, 0); }
-          100% { transform: translate3d(-50%, 0, 0); }
-        }
-      `}</style>
-
       {/* Background Soft Lighting Glow behind huge text */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[600px] md:w-[900px] h-[250px] sm:h-[350px] bg-white/[0.04] rounded-full blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
 

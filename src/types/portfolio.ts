@@ -1,5 +1,3 @@
-export type ProjectCategory = 'all' | 'rigging' | 'motion' | 'discord' | 'dev';
-
 export interface ClientReview {
   author: string;
   rating: number;

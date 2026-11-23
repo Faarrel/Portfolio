@@ -14,7 +14,7 @@
 
 @theme {
   --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
+  --font-mono: ui-monospace, SFMono-Regular, monospace;
 }
 
 :root {
@@ -81,7 +81,9 @@ html, body {
 }
 
 .hero-title {
-  display: inline-block !important;
+  display: inline-flex !important;
+  justify-content: center !important;
+  align-items: center !important;
   letter-spacing: -0.065em !important;
   transform-origin: 50% 50% !important;
   text-align: center !important;
@@ -93,4 +95,28 @@ html, body {
 
 .hero-title:hover {
   letter-spacing: -0.035em !important;
+}
+
+/* Hero Marquee Animation */
+.marquee-container {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.marquee-content {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 24s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+.marquee-content:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee-scroll {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
 }

@@ -9,11 +9,6 @@ export const FIVERR_LINKS = {
 
 export const PERSONAL_INFO = {
   name: 'Faarrel',
-  fullName: 'Faarrel',
-  tagline: 'Graphic Designer, Character Animator, Discord Architect & Fullstack Developer',
-  bio: 'Operating at the intersection of visual creativity and engineering. Specializing in graphic design (Photoshop, Alight Motion), character animation (After Effects), building & setting up complete Discord servers, and fullstack development (Next.js web applications & custom Discord bots in discord.js/discord.py).',
-  location: 'Indonesia · Available Globally',
-  status: 'Open for Commissions & Freelance',
   email: 'muhammadfarrelyf@gmail.com',
   discordHandle: 'faarrel',
   socials: {
@@ -22,12 +17,6 @@ export const PERSONAL_INFO = {
     instagram: 'https://www.instagram.com/fxrrel_/',
     fiverr: 'https://www.fiverr.com/faarrel',
   },
-  metrics: [
-    { value: '4.9 ★', label: 'Fiverr Client Rating' },
-    { value: '300+', label: 'Delivered Fiverr Orders' },
-    { value: '45k+', label: 'Discord Members Managed' },
-    { value: '99.9%', label: 'Delivery Reliability' },
-  ],
 };
 
 export const GRAPHIC_DESIGN_GALLERY = [
