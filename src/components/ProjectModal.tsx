@@ -67,6 +67,19 @@ const getVideoSource = (url: string): string => {
   return url;
 };
 
+const getStaticThumbnail = (url: string): string => {
+  if (!url) return '';
+  if (isMediaVideo(url)) {
+    return getVideoPoster(url);
+  }
+  if (url.includes('cloudinary.com/image/upload/')) {
+    let u = url.replace(/\/image\/upload\/[^/]+\//, '/image/upload/pg_1,q_auto,f_jpg/');
+    u = u.replace(/\.gif$/i, '.jpg');
+    return u;
+  }
+  return url;
+};
+
 export default function ProjectModal({ item, onClose }: ProjectModalProps) {
   const [activeLightboxIndex, setActiveLightboxIndex] = useState<number | null>(null);
 
@@ -222,24 +235,19 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                       aria-label={`View ${item.title} preview`}
                       className="relative w-full aspect-[16/9] max-h-60 rounded-2xl overflow-hidden bg-black/50 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
                     >
-                      {isMediaVideo(galleryList[0]) ? (
-                        <video
-                          src={getVideoSource(galleryList[0])}
-                          poster={getVideoPoster(galleryList[0])}
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
-                          src={galleryList[0]}
-                          alt={item.title}
-                          className="w-full h-full object-cover"
-                          loading="eager"
-                        />
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={getStaticThumbnail(galleryList[0])}
+                        alt={item.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                      {isMediaVideo(galleryList[0]) && (
+                        <div className="absolute bottom-2.5 right-2.5 size-7 rounded-full bg-black/70 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white pointer-events-none shadow-md">
+                          <svg className="size-3.5 fill-current ml-0.5" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                          </svg>
+                        </div>
                       )}
                       <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[1px]">
                         <div className="size-10 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
@@ -256,24 +264,19 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                         aria-label={`View ${item.title} preview 1`}
                         className="relative aspect-square rounded-2xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm ring-1 ring-white/5"
                       >
-                        {isMediaVideo(galleryList[0]) ? (
-                          <video
-                            src={getVideoSource(galleryList[0])}
-                            poster={getVideoPoster(galleryList[0])}
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          /* eslint-disable-next-line @next/next/no-img-element */
-                          <img
-                            src={galleryList[0]}
-                            alt={`${item.title} preview 1`}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            loading="eager"
-                          />
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={getStaticThumbnail(galleryList[0])}
+                          alt={`${item.title} preview 1`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
+                        {isMediaVideo(galleryList[0]) && (
+                          <div className="absolute bottom-2.5 right-2.5 size-7 rounded-full bg-black/70 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white pointer-events-none shadow-md">
+                            <svg className="size-3.5 fill-current ml-0.5" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          </div>
                         )}
                         <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[1px]">
                           <div className="size-10 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
@@ -289,24 +292,19 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                         aria-label={galleryList.length > 2 ? `View all ${galleryList.length} media items` : `View ${item.title} preview 2`}
                         className="relative aspect-square rounded-2xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm ring-1 ring-white/5"
                       >
-                        {isMediaVideo(galleryList[1]) ? (
-                          <video
-                            src={getVideoSource(galleryList[1])}
-                            poster={getVideoPoster(galleryList[1])}
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          /* eslint-disable-next-line @next/next/no-img-element */
-                          <img
-                            src={galleryList[1]}
-                            alt={`${item.title} preview 2`}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                            loading="eager"
-                          />
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={getStaticThumbnail(galleryList[1])}
+                          alt={`${item.title} preview 2`}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
+                        {isMediaVideo(galleryList[1]) && galleryList.length <= 2 && (
+                          <div className="absolute bottom-2.5 right-2.5 size-7 rounded-full bg-black/70 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white pointer-events-none shadow-md">
+                            <svg className="size-3.5 fill-current ml-0.5" viewBox="0 0 24 24">
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          </div>
                         )}
 
                         {galleryList.length > 2 ? (
@@ -519,7 +517,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                     <div className="flex items-center gap-2 sm:gap-2.5 px-3.5 py-2.5 bg-[#121214]/90 border border-white/10 rounded-2xl backdrop-blur-md max-w-full overflow-x-auto shadow-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                       {galleryList.map((thumbUrl, idx) => {
                         const isActive = idx === activeLightboxIndex;
-                        const poster = isMediaVideo(thumbUrl) ? getVideoPoster(thumbUrl) : thumbUrl;
+                        const poster = getStaticThumbnail(thumbUrl);
                         return (
                           <button
                             key={idx}
