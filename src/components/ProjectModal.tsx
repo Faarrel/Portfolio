@@ -102,6 +102,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
   // Forward wheel scrolling from anywhere (backdrop, header, footer) to modal content
   const handleWheel = (e: React.WheelEvent) => {
     if (activeLightboxIndex !== null || !contentRef.current) return;
+    e.stopPropagation();
     if (!contentRef.current.contains(e.target as Node)) {
       contentRef.current.scrollTop += e.deltaY;
     }
@@ -118,7 +119,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
     }
   }, [activeLightboxIndex]);
 
-  // Keyboard navigation & lock body + html scroll so background website NEVER scrolls
+  // Keyboard navigation, lock body + html scroll, & pause Lenis so background website NEVER scrolls
   useEffect(() => {
     if (!item) return;
 
@@ -146,11 +147,13 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
     const originalHtmlOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
+    (window as any).__lenis?.stop();
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       document.body.style.overflow = originalBodyOverflow;
       document.documentElement.style.overflow = originalHtmlOverflow;
+      (window as any).__lenis?.start();
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [item, onClose, activeLightboxIndex, galleryList.length]);
@@ -159,6 +162,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
     <AnimatePresence>
       {item && (
         <div
+          data-lenis-prevent
           onWheel={handleWheel}
           className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 md:p-6 overflow-hidden"
         >
@@ -174,6 +178,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
 
           {/* Modal Dialog Card */}
           <motion.div
+            data-lenis-prevent
             initial={{ opacity: 0, scale: 0.96, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 16 }}
@@ -201,6 +206,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
               {/* Scrollable Content Area: strictly constrained by min-h-0 so header/footer are never pushed */}
               <div
                 ref={contentRef}
+                data-lenis-prevent
                 tabIndex={0}
                 className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-4 focus:outline-none [scrollbar-width:thin] [scrollbar-color:#52525b_transparent] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-white/[0.02] [&::-webkit-scrollbar-thumb]:bg-zinc-600/70 hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500 [&::-webkit-scrollbar-thumb]:rounded-full"
               >
@@ -424,6 +430,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
             {activeLightboxIndex !== null && galleryList.length > 0 && (
               <motion.div
                 key="lightbox-container"
+                data-lenis-prevent
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
