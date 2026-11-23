@@ -126,12 +126,15 @@ function getActivityAssets(activity?: LanyardActivity) {
   } else if (appId === '1545653843239374848' || activity.name.toLowerCase() === 'orca') {
     // Official Orca Application Icon (Discord RPC)
     largeUrl = 'https://cdn.discordapp.com/app-icons/1545653843239374848/45fa5380de015ee75348b94328a56a61.png';
+  } else if (appId === '363445589247131668' || activity.name.toLowerCase() === 'roblox') {
+    // Official Roblox Application Icon (Discord Game Detection)
+    largeUrl = 'https://cdn.discordapp.com/app-icons/363445589247131668/f2b60e350a2097289b3b0b877495e55f.png';
   } else if (appId) {
     largeUrl = smallAsset ? getAssetUrl(appId, smallAsset) : null;
   }
 
   let smallUrl: string | null = null;
-  if (smallAsset && (largeAsset || appId === '1545653843239374848')) {
+  if (smallAsset && (largeAsset || appId === '1545653843239374848' || appId === '363445589247131668' || activity.name.toLowerCase() === 'roblox')) {
     smallUrl = getAssetUrl(appId, smallAsset);
   }
 
