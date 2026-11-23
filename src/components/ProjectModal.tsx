@@ -395,7 +395,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                       <span className="text-zinc-500">·</span>
                       <span className="text-zinc-400">@{item.clientReview.author}</span>
                     </div>
-                    <span className="text-amber-400 font-bold">
+                    <span className="text-white font-bold">
                       ★ {item.clientReview.rating.toFixed(1)} / 5.0
                     </span>
                   </div>
