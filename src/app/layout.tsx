@@ -1,24 +1,18 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, Recursive, Geist_Mono } from "next/font/google";
+import { Montserrat, Poppins } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const montserrat = Montserrat({
+  variable: "--font-montserrat",
   subsets: ["latin"],
   display: "swap",
 });
 
-const recursive = Recursive({
-  variable: "--font-recursive",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
-  axes: ["slnt"],
-  display: "swap",
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
   display: "swap",
 });
 
@@ -136,7 +130,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${outfit.variable} ${recursive.variable} ${geistMono.variable} ${planetKosmos.variable} dark scroll-smooth`}
+      className={`${montserrat.variable} ${poppins.variable} ${planetKosmos.variable} dark scroll-smooth`}
       suppressHydrationWarning
     >
       <head>

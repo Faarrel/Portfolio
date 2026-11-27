@@ -97,7 +97,7 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
 ]
 
 const SANS_STACK = '"Helvetica Neue", Arial, sans-serif'
-const MONO_STACK = 'var(--font-geist-mono), var(--font-outfit), ui-monospace, SFMono-Regular, monospace'
+const MONO_STACK = 'var(--font-poppins), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
 
 // #region halftone
 // Pure helpers, lifted out and executed by tests/halftone-wordmark-footer.test.mjs.
