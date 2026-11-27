@@ -14,16 +14,11 @@
 
 import * as React from "react"
 
-export interface HalftonePalette {
-  /** The footer background. */
+interface HalftonePalette {
   background: string
-  /** The dots at rest, and the text. */
   ink: string
-  /** The colour a dot warms toward as it is pushed off its place. */
   warm: string
 }
-
-export type HalftonePreset = "night" | "paper" | "ember" | "cobalt"
 
 export interface FooterLink {
   label: string
@@ -36,92 +31,47 @@ export interface FooterColumn {
 }
 
 export interface HalftoneWordmarkFooterProps {
-  /** The giant word printed in dots. Lowercase reads best. */
   wordmark?: string
-  /** Top-left studio line. */
   label?: string
-  /** The muted line under it. */
   meta?: string
-  /** Link columns along the top. */
   columns?: FooterColumn[]
-  /** Show the back-to-top link. It scrolls the window to 0. Defaults to true. */
-  backToTop?: boolean
-  /** Starting colours. Defaults to "night". */
-  preset?: HalftonePreset
-  /** Colour overrides, merged over the preset. */
   palette?: { background?: string; ink?: string; warm?: string }
-  /** Distance between dot centres, in CSS px. Defaults to 6. */
   dotGap?: number
-  /** How far the pointer pushes, in CSS px. Defaults to 80. */
   radius?: number
-  /** How much of the word's cap height hangs below the bottom edge, 0–0.6. Defaults to 0.2. */
   crop?: number
-  /** Print grain over everything, 0–1. Defaults to 0.5. */
   grain?: number
-  /** Pointer and click response. Defaults to true. */
   interactive?: boolean
-  /** Face for the wordmark. Heavy grotesks print best. */
   fontFamily?: string
-  /** Weight of the wordmark. Defaults to 800. */
   fontWeight?: number
-  /** Face for the small type. */
   monoFamily?: string
-  /** Root height. A definite length, never a percentage. */
   height?: string
-  /** Mobile root height for screens <= 640px. Defaults to 380px. */
   mobileHeight?: string
-  /** Tablet root height for screens 641px - 1024px. Defaults to 460px. */
   tabletHeight?: string
-  /** Extra root class names. */
   className?: string
 }
 
-const PRESETS: { [K in HalftonePreset]: HalftonePalette } = {
-  night: { background: "#0c0c0b", ink: "#e9e4da", warm: "#e9762b" },
-  paper: { background: "#efebe3", ink: "#17150f", warm: "#c2361c" },
-  ember: { background: "#160a06", ink: "#f2c48c", warm: "#ff5a1f" },
-  cobalt: { background: "#0d1b4d", ink: "#dfe7ff", warm: "#ffcd3c" },
+const DEFAULT_PALETTE: HalftonePalette = {
+  background: "#0c0c0b",
+  ink: "#e9e4da",
+  warm: "#e9762b",
 }
-
-const DEFAULT_COLUMNS: FooterColumn[] = [
-  {
-    title: "Connect",
-    links: [
-      { label: "Discord", href: "https://discord.com/users/938045579215380510" },
-      { label: "GitHub", href: "https://github.com/Faarrel" },
-      { label: "Instagram", href: "https://www.instagram.com/fxrrel_/" },
-      { label: "Fiverr", href: "https://www.fiverr.com/faarrel" },
-      { label: "Email", href: "mailto:muhammadfarrelyf@gmail.com" },
-    ],
-  },
-]
 
 const SANS_STACK = '"Helvetica Neue", Arial, sans-serif'
 const MONO_STACK = 'var(--font-poppins), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
 
-// #region halftone
-// Pure helpers, lifted out and executed by tests/halftone-wordmark-footer.test.mjs.
-
-/** Hex → [r, g, b] in 0–255, or null for anything that isn't #rgb / #rrggbb. */
-export function hwfHex(hex: string) {
+function hwfHex(hex: string) {
   const m = /^#?([0-9a-f]{3}|[0-9a-f]{6})$/i.exec((hex || "").trim())
   if (!m) return null
   const h = m[1].length === 3 ? m[1].split("").map((c) => c + c).join("") : m[1]
   return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)]
 }
 
-/** Dot radius for a cell coverage in [0, 1]: area-true, so tone stays even. */
-export function hwfRadius(coverage: number, gap: number) {
+function hwfRadius(coverage: number, gap: number) {
   const c = coverage < 0 ? 0 : coverage > 1 ? 1 : coverage
   return Math.sqrt(c) * gap * 0.56
 }
 
-/**
- * One step of a dot's spring back to home, plus the push from a pointer at
- * (px, py) within radius r. Returns [x, y, vx, vy]. Away from the pointer a
- * displaced dot always heads home and comes to rest.
- */
-export function hwfStep(
+function hwfStep(
   x: number, y: number, vx: number, vy: number,
   hx: number, hy: number, px: number, py: number, r: number,
 ) {
@@ -139,17 +89,14 @@ export function hwfStep(
   return [x + vx, y + vy, vx, vy]
 }
 
-/** How warm a dot is drawn: 0 at home, 1 once it is `span` px or more away. */
-export function hwfWarmth(x: number, y: number, hx: number, hy: number, span: number) {
+function hwfWarmth(x: number, y: number, hx: number, hy: number, span: number) {
   const d = Math.hypot(x - hx, y - hy)
   return span > 0 ? Math.min(1, d / span) : 0
 }
 
-/** Font size that sets `measured` (width at 100px) to fill `width` exactly. */
-export function hwfFitSize(measured: number, width: number) {
+function hwfFitSize(measured: number, width: number) {
   return measured > 0 ? (width / measured) * 100 : 0
 }
-// #endregion
 
 const HWF_CSS = `
 .hwf-root {
@@ -179,21 +126,14 @@ const HWF_CSS = `
 .hwf-col { margin-left: auto; text-align: right; }
 .hwf-col h3 { margin: 0; font: inherit; font-weight: 700; color: #a1a1aa; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; text-align: right; }
 .hwf-col ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-.hwf-col a, .hwf-up {
+.hwf-col a {
   color: #e4e4e7; font-weight: 600; text-decoration: none; opacity: 1; background: none; border: 0; padding: 3px 0;
   font: inherit; font-size: 13px; letter-spacing: 0.05em; text-transform: uppercase; cursor: pointer;
   background-image: linear-gradient(currentColor, currentColor); background-size: 0% 1px;
   background-repeat: no-repeat; background-position: 100% 100%; transition: opacity .25s ease, color .2s ease, background-size .35s cubic-bezier(.2,.7,.1,1);
 }
-.hwf-up { min-height: 44px; padding: 8px 12px; display: inline-flex; align-items: center; }
-.hwf-col a:hover, .hwf-up:hover { opacity: 1; background-size: 100% 1px; color: #ffffff; }
-.hwf-col a:focus-visible, .hwf-up:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; opacity: 1; }
-.hwf-rule {
-  position: relative; z-index: 1; display: flex; justify-content: flex-end; align-items: center; gap: 16px;
-  margin: clamp(18px, 2.6vw, 30px) clamp(20px, 3.4vw, 44px) 0; padding-top: 12px;
-  border-top: none;
-  font-family: var(--hwf-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
-}
+.hwf-col a:hover { opacity: 1; background-size: 100% 1px; color: #ffffff; }
+.hwf-col a:focus-visible { outline: 1px solid currentColor; outline-offset: 3px; opacity: 1; }
 .hwf-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (max-width: 720px) {
   .hwf-top { flex-direction: column; row-gap: 16px; padding: 20px 20px 0; }
@@ -203,10 +143,10 @@ const HWF_CSS = `
   .hwf-col { margin-left: 0; text-align: left; }
   .hwf-col h3 { text-align: left; margin-bottom: 6px; font-size: 12px; }
   .hwf-col ul { align-items: flex-start; gap: 2px; }
-  .hwf-col a, .hwf-up { font-size: 12px; padding: 2px 0; }
+  .hwf-col a { font-size: 12px; padding: 2px 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hwf-col a, .hwf-up { transition: none; }
+  .hwf-col a { transition: none; }
 }
 `
 
@@ -214,9 +154,7 @@ export default function HalftoneWordmarkFooter({
   wordmark = "faarrel",
   label = "Faarrel Studio",
   meta = "©2026 · Creative Technologist",
-  columns = DEFAULT_COLUMNS,
-  backToTop = true,
-  preset = "night",
+  columns = [],
   palette,
   dotGap = 6,
   radius = 85,
@@ -231,7 +169,7 @@ export default function HalftoneWordmarkFooter({
   tabletHeight = "460px",
   className = "",
 }: HalftoneWordmarkFooterProps) {
-  const colors = React.useMemo(() => ({ ...(PRESETS[preset] || PRESETS.night), ...(palette || {}) }), [preset, palette])
+  const colors = React.useMemo(() => ({ ...DEFAULT_PALETTE, ...(palette || {}) }), [palette])
   const rootRef = React.useRef(null as HTMLElement | null)
   const canvasRef = React.useRef(null as HTMLCanvasElement | null)
   const opts = React.useRef({ colors, dotGap, radius, crop, grain, interactive, fontFamily, fontWeight, wordmark })
@@ -260,7 +198,20 @@ export default function HalftoneWordmarkFooter({
     // Flat arrays: x, y, vx, vy, hx, hy, r per dot.
     let dots = new Float32Array(0)
     let count = 0
-    let grainTile = null as HTMLCanvasElement | null
+    const grainCanvas = document.createElement("canvas")
+    grainCanvas.width = 256
+    grainCanvas.height = 256
+    const gc = grainCanvas.getContext("2d")
+    if (gc) {
+      const id = gc.createImageData(256, 256)
+      for (let i = 0; i < id.data.length; i += 4) {
+        const v = Math.random() * 255
+        id.data[i] = id.data[i + 1] = id.data[i + 2] = v
+        id.data[i + 3] = Math.random() < 0.5 ? 0 : 255
+      }
+      gc.putImageData(id, 0, 0)
+    }
+    const grainPattern = ctx.createPattern(grainCanvas, "repeat")
     const ink = hwfHex(opts.current.colors.ink) || [233, 228, 218]
     const warm = hwfHex(opts.current.colors.warm) || [233, 118, 43]
 
@@ -323,21 +274,6 @@ export default function HalftoneWordmarkFooter({
       }
       dots = new Float32Array(tmp)
       count = tmp.length / 7
-
-      // A fixed tile of print grain, drawn once and laid over every frame.
-      grainTile = document.createElement("canvas")
-      grainTile.width = 256
-      grainTile.height = 256
-      const g = grainTile.getContext("2d")
-      if (g) {
-        const id = g.createImageData(256, 256)
-        for (let i = 0; i < id.data.length; i += 4) {
-          const v = Math.random() * 255
-          id.data[i] = id.data[i + 1] = id.data[i + 2] = v
-          id.data[i + 3] = Math.random() < 0.5 ? 0 : 255
-        }
-        g.putImageData(id, 0, 0)
-      }
       awake = true
     }
 
@@ -401,14 +337,11 @@ export default function HalftoneWordmarkFooter({
         ctx.fill()
       }
 
-      if (grainTile && o.grain > 0) {
+      if (grainPattern && o.grain > 0) {
         ctx.globalAlpha = Math.min(1, o.grain) * 0.09
         ctx.globalCompositeOperation = "overlay"
-        const pattern = ctx.createPattern(grainTile, "repeat")
-        if (pattern) {
-          ctx.fillStyle = pattern
-          ctx.fillRect(0, 0, w, h)
-        }
+        ctx.fillStyle = grainPattern
+        ctx.fillRect(0, 0, w, h)
         ctx.globalAlpha = 1
         ctx.globalCompositeOperation = "source-over"
       }
@@ -489,12 +422,6 @@ export default function HalftoneWordmarkFooter({
     }
   }, [key])
 
-  const toTop = () => {
-    if (typeof window !== "undefined") {
-      window.scrollTo({ top: 0, behavior: "smooth" })
-    }
-  }
-
   return (
     <footer
       ref={rootRef}
@@ -532,13 +459,6 @@ export default function HalftoneWordmarkFooter({
           </nav>
         ))}
       </div>
-      {backToTop ? (
-        <div className="hwf-rule">
-          <button type="button" className="hwf-up" onClick={toTop}>
-            Back to top ↑
-          </button>
-        </div>
-      ) : null}
     </footer>
   )
 }

@@ -107,8 +107,6 @@ export default function ContactSection() {
         label="FAARREL STUDIO"
         meta="B.S. in Computer Science · Graphic Designer · Character Animator · Fullstack Developer"
         columns={footerColumns}
-        backToTop={false}
-        preset="night"
         palette={{ background: '#121212', ink: '#E0E0E0', warm: '#888888' }}
         height="560px"
         tabletHeight="460px"

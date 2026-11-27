@@ -396,5 +396,3 @@ export const GridPattern = (props: GridPatternProps) => {
     </div>
   );
 };
-
-export default GridPattern;

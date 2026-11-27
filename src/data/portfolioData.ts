@@ -59,11 +59,6 @@ export const PROJECTS: ProjectItem[] = [
     externalUrl: FIVERR_LINKS.portfolio,
     externalLabel: 'View on Fiverr',
     externalType: 'fiverr',
-    clientReview: {
-      author: 'ambient_kot',
-      rating: 5,
-      comment: 'Guy nailed what I asked for and delivered it in record time.',
-    },
     details: [
       'Personal Discord Nitro: 60 FPS looped profile avatars and bio banners',
       'Discord Server Communities: custom server icons, welcome banners, and channel artwork',
@@ -85,11 +80,6 @@ export const PROJECTS: ProjectItem[] = [
     externalUrl: FIVERR_LINKS.animatedProfile,
     externalLabel: 'View on Fiverr',
     externalType: 'fiverr',
-    clientReview: {
-      author: 'syndorei',
-      rating: 5,
-      comment: 'Very good work and he worked very fast. Delivered exactly what I needed.',
-    },
     details: [
       'Multi-layer PSD separation: hair, eyes, facial expressions, and clothing physics',
       'Smooth 60 FPS looped output delivered as high-definition MP4/GIF/APNG',

@@ -1,9 +1,3 @@
-export interface ClientReview {
-  author: string;
-  rating: number;
-  comment: string;
-}
-
 export interface ProjectItem {
   id: string;
   title: string;
@@ -19,6 +13,5 @@ export interface ProjectItem {
   externalType?: 'fiverr' | 'discord' | 'github' | 'external';
   previewUrl?: string;
   gallery?: string[];
-  clientReview?: ClientReview;
   details: string[];
 }

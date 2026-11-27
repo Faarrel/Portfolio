@@ -29,11 +29,6 @@ export interface ProjectModalItem {
   externalType?: 'fiverr' | 'discord' | 'github' | 'external';
   previewUrl?: string;
   gallery?: string[];
-  clientReview?: {
-    author: string;
-    rating: number;
-    comment: string;
-  };
 }
 
 interface ProjectModalProps {
@@ -446,29 +441,6 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                         {item.tools.join(' · ')}
                       </p>
                     )}
-                  </div>
-                )}
-
-                {/* Verified Client Review (editorial divider, no nested card box) */}
-                {item.clientReview && (
-                  <div className="border-t border-[var(--border)] pt-4 flex flex-col gap-1.5">
-                    <div className="flex items-center justify-between gap-2 text-xs">
-                      <div className="flex items-center gap-1.5 font-semibold text-zinc-100 min-w-0">
-                        <span className="truncate">Verified Client Review</span>
-                        <span className="text-[var(--muted-foreground)]" aria-hidden="true">
-                          ·
-                        </span>
-                        <span className="text-[var(--muted-foreground)] font-mono truncate">
-                          @{item.clientReview.author}
-                        </span>
-                      </div>
-                      <span className="text-white font-bold tabular-nums shrink-0">
-                        ★ {item.clientReview.rating.toFixed(1)} / 5.0
-                      </span>
-                    </div>
-                    <p className="text-xs sm:text-[13px] text-zinc-200 italic leading-relaxed">
-                      &ldquo;{item.clientReview.comment}&rdquo;
-                    </p>
                   </div>
                 )}
               </div>

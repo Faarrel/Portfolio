@@ -23,21 +23,8 @@
   --foreground: #E0E0E0;
   --card: #161618;
   --card-foreground: #F4F4F5;
-  --popover: #161618;
-  --popover-foreground: #F4F4F5;
-  --primary: #FFFFFF;
-  --primary-foreground: #121212;
-  --secondary: #1F1F23;
-  --secondary-foreground: #F4F4F5;
-  --muted: #27272A;
   --muted-foreground: #A1A1AA;
-  --accent: #27272A;
-  --accent-foreground: #FFFFFF;
-  --destructive: #EF4444;
-  --destructive-foreground: #F8FAFC;
   --border: #27272A;
-  --input: #27272A;
-  --ring: #52525B;
 }
 
 html {

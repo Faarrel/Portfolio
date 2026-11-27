@@ -104,11 +104,6 @@ export default function BentoSection() {
         externalUrl: FIVERR_LINKS.portfolio,
         externalLabel: 'View on Fiverr',
         externalType: 'fiverr' as const,
-        clientReview: {
-          author: 'minjeji0704',
-          rating: 5,
-          comment: 'Very fast work and good quality',
-        },
       },
     },
     {
@@ -133,11 +128,6 @@ export default function BentoSection() {
         externalUrl: FIVERR_LINKS.animatedProfile,
         externalLabel: 'View on Fiverr',
         externalType: 'fiverr' as const,
-        clientReview: {
-          author: 'syndorei',
-          rating: 5,
-          comment: 'Very good work and he worked very fast. Delivered exactly what I needed.',
-        },
       },
     },
     {
@@ -162,11 +152,6 @@ export default function BentoSection() {
         externalUrl: 'https://discord.com/users/938045579215380510',
         externalLabel: 'Contact on Discord',
         externalType: 'discord' as const,
-        clientReview: {
-          author: 'gvent7',
-          rating: 5,
-          comment: 'Absolutely incredible job! Met the deadline and very quick.',
-        },
       },
     },
     {
