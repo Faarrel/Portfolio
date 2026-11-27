@@ -256,7 +256,7 @@ export default function BentoSection() {
                 {/* Title & Professional Profile Capabilities */}
                 <div>
                   <h3 className="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-3 sm:mb-4">
-                    i&apos;m <span className="font-planet-kosmos text-2xl sm:text-3xl font-normal tracking-wide text-white" style={{ fontFamily: "'Planet Kosmos', sans-serif" }}>faarrel</span>
+                    i&apos;m <span className="font-inktera text-2xl sm:text-3xl font-normal tracking-wide text-white">faarrel</span>
                   </h3>
 
                   <ul className="space-y-2 sm:space-y-2.5 text-xs sm:text-sm text-zinc-300 font-medium">

@@ -16,9 +16,9 @@ const poppins = Poppins({
   display: "swap",
 });
 
-const planetKosmos = localFont({
-  src: "../../public/fonts/planet-kosmos.ttf",
-  variable: "--font-planet-kosmos",
+const inktera = localFont({
+  src: "../../public/fonts/inktera.otf",
+  variable: "--font-inktera",
   display: "block",
 });
 
@@ -130,15 +130,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${montserrat.variable} ${poppins.variable} ${planetKosmos.variable} dark scroll-smooth`}
+      className={`${montserrat.variable} ${poppins.variable} ${inktera.variable} dark scroll-smooth`}
       suppressHydrationWarning
     >
       <head>
         <link
           rel="preload"
-          href="/fonts/planet-kosmos.ttf"
+          href="/fonts/inktera.otf"
           as="font"
-          type="font/ttf"
+          type="font/otf"
           crossOrigin="anonymous"
         />
         <link

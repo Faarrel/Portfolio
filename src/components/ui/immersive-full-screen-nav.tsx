@@ -295,8 +295,7 @@ function FullscreenNav({
         >
           <img src="/logo.webp" alt="Faarrel" className="w-7 h-7 sm:w-8 sm:h-8 object-contain transition-transform duration-300 group-hover:scale-105" />
           <span
-            className="font-planet-kosmos text-base sm:text-lg font-normal tracking-wide text-white transition-colors duration-300"
-            style={{ fontFamily: "'Planet Kosmos', sans-serif" }}
+            className="font-inktera text-base sm:text-lg font-normal tracking-wide text-white transition-colors duration-300"
           >
             {brand}
           </span>
