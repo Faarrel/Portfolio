@@ -2,7 +2,6 @@ export interface ClientReview {
   author: string;
   rating: number;
   comment: string;
-  orderType?: string;
 }
 
 export interface ProjectItem {
@@ -15,9 +14,6 @@ export interface ProjectItem {
   role: string;
   tools: string[];
   metrics?: string;
-  featured?: boolean;
-  liveUrl?: string;
-  githubUrl?: string;
   externalUrl?: string;
   externalLabel?: string;
   externalType?: 'fiverr' | 'discord' | 'github' | 'external';

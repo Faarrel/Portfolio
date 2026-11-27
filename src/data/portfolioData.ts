@@ -2,9 +2,7 @@ import { ProjectItem } from '@/types/portfolio';
 
 export const FIVERR_LINKS = {
   portfolio: 'https://www.fiverr.com/users/faarrel/portfolio',
-  animatedBanner: 'https://www.fiverr.com/faarrel/create-an-animated-banner-for-discord',
   animatedProfile: 'https://www.fiverr.com/faarrel/animate-your-discord-profile',
-  profile: 'https://www.fiverr.com/faarrel',
 };
 
 export const PERSONAL_INFO = {
@@ -56,7 +54,6 @@ export const PROJECTS: ProjectItem[] = [
     role: 'Motion Designer & Compositor',
     tools: ['After Effects', 'Photoshop', 'Alight Motion'],
     metrics: '300+ Delivered Orders · 5.0 Rating · 60 FPS',
-    featured: true,
     previewUrl: GRAPHIC_DESIGN_GALLERY[0],
     gallery: GRAPHIC_DESIGN_GALLERY,
     externalUrl: FIVERR_LINKS.portfolio,
@@ -83,7 +80,6 @@ export const PROJECTS: ProjectItem[] = [
     role: 'Lead Animator & Rigger',
     tools: ['After Effects', 'Photoshop', 'Alight Motion'],
     metrics: '136+ Fiverr Reviews · 5.0 Rating · 60 FPS',
-    featured: true,
     previewUrl: 'https://fiverr-res.cloudinary.com/video/upload/so_0/jnfbmxmd0zr3i6dckiwi.jpg',
     gallery: CHARACTER_ANIMATION_GALLERY,
     externalUrl: FIVERR_LINKS.animatedProfile,
@@ -109,13 +105,11 @@ export const PROJECTS: ProjectItem[] = [
     role: 'Fullstack Creative Developer',
     tools: ['Next.js 16', 'React 19', 'TypeScript', 'Tailwind CSS', 'Framer Motion'],
     metrics: 'Pinned GitHub Repo · 100% Lighthouse Score',
-    featured: true,
     previewUrl: '/og-image.webp',
     gallery: [
       '/og-image.webp',
       '/logo.webp',
     ],
-    githubUrl: 'https://github.com/Faarrel/Portfolio',
     externalUrl: 'https://github.com/Faarrel/Portfolio',
     externalLabel: 'View on GitHub',
     externalType: 'github',
@@ -134,40 +128,12 @@ export const PROJECTS: ProjectItem[] = [
     role: 'Backend & Bot Engineer',
     tools: ['TypeScript', 'discord.js', 'Node.js', 'Python', 'Discord API'],
     metrics: 'Fast Event Dispatch · 99.9% Uptime',
-    featured: true,
-    githubUrl: 'https://github.com/Faarrel',
     externalUrl: 'https://github.com/Faarrel',
     externalLabel: 'View on GitHub',
     externalType: 'github',
     details: [
       'Modular event-driven command handler with slash command deployment',
       'Secure role gatekeeping and webhook logging infrastructure',
-    ],
-  },
-  {
-    id: 'discord-server-architecture',
-    title: 'Discord Server Infrastructure & Guild Setup',
-    category: 'discord',
-    categoryLabel: 'Discord Architecture',
-    description: 'Turnkey Discord guild setup for 45,000+ members: anti-raid verification gates, tiered role hierarchy, custom bots, and ticketing.',
-    year: '2023 - 2026',
-    role: 'Discord Community Architect',
-    tools: ['Discord API', 'Security Bots', 'Role Hierarchy'],
-    metrics: '45,000+ Members Managed · 0 Raid Breaches',
-    featured: false,
-    previewUrl: DISCORD_ARCHITECTURE_GALLERY[0],
-    gallery: DISCORD_ARCHITECTURE_GALLERY,
-    externalUrl: 'https://discord.com/users/938045579215380510',
-    externalLabel: 'Contact on Discord',
-    externalType: 'discord',
-    clientReview: {
-      author: 'minjeji0704',
-      rating: 5,
-      comment: 'Very fast work and good quality',
-    },
-    details: [
-      '3-tier frictionless onboarding with automated captcha and age verification',
-      'Direct Discord collaboration for custom server builds and community security',
     ],
   },
 ];

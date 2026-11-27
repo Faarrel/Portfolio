@@ -24,7 +24,6 @@ export interface ProjectModalItem {
   tools?: string[];
   metrics?: string;
   details?: string[];
-  githubUrl?: string;
   externalUrl?: string;
   externalLabel?: string;
   externalType?: 'fiverr' | 'discord' | 'github' | 'external';
@@ -34,7 +33,6 @@ export interface ProjectModalItem {
     author: string;
     rating: number;
     comment: string;
-    orderType?: string;
   };
 }
 
@@ -126,12 +124,6 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
     };
   }, [item]);
 
-  // Prevent any scrolling when cursor is outside the modal card
-  const handleOuterWheel = (e: React.WheelEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-  };
-
   // Scroll active thumbnail smoothly into view when lightbox index changes
   useEffect(() => {
     if (activeLightboxIndex !== null && thumbnailRefs.current[activeLightboxIndex]) {
@@ -187,7 +179,6 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
       {item && (
         <div
           data-lenis-prevent
-          onWheel={handleOuterWheel}
           className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 md:p-6 overflow-hidden"
         >
           {/* Backdrop with frosted dark blur */}
@@ -540,7 +531,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                     ) : (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
-                        src={galleryList[activeLightboxIndex].replace('t_delivery_thumb,', '')}
+                        src={galleryList[activeLightboxIndex]}
                         alt={`${item.title} enlarged ${activeLightboxIndex + 1}`}
                         className="max-w-full max-h-[66vh] sm:max-h-[72vh] object-contain rounded-xl border border-white/15 shadow-2xl bg-black/60"
                       />

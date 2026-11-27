@@ -188,7 +188,6 @@ export default function BentoSection() {
           'Production Discord bots with custom slash commands and state machine moderation',
           'High performance Next.js web applications with minimal, zero-slop architecture',
         ],
-        githubUrl: 'https://github.com/Faarrel/Portfolio',
         externalUrl: 'https://github.com/Faarrel/Portfolio',
         externalLabel: 'View on GitHub',
         externalType: 'github' as const,
