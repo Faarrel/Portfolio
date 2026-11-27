@@ -42,7 +42,7 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="flex justify-center items-center w-full max-w-full overflow-hidden"
           >
-            <h1 className="hero-title text-[13.5vw] sm:text-8xl md:text-9xl lg:text-[11rem] xl:text-[13rem] leading-none text-white uppercase select-none my-2 sm:my-4">
+            <h1 className="inline-flex justify-center items-center text-center mx-auto tracking-[-0.065em] text-[13.5vw] sm:text-8xl md:text-9xl lg:text-[11rem] xl:text-[13rem] leading-none text-white uppercase select-none my-2 sm:my-4">
               <VariableFontCursorProximity
                 fromFontVariationSettings="'wght' 400"
                 toFontVariationSettings="'wght' 900"
