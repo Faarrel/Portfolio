@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Lenis from 'lenis';
 import {
@@ -41,6 +41,15 @@ interface ProjectModalProps {
   onClose: () => void;
 }
 
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
+
 const isMediaVideo = (url?: string | null): boolean => {
   if (!url) return false;
   return url.includes('/video/upload/') || url.endsWith('.mp4') || url.endsWith('.webm');
@@ -72,7 +81,7 @@ const getStaticThumbnail = (url: string): string => {
     return getVideoPoster(url);
   }
   if (url.includes('cloudinary.com/image/upload/')) {
-    let u = url.replace(/\/image\/upload\/[^/]+\//, '/image/upload/pg_1,q_auto,f_jpg/');
+    let u = url.replace(/\/image\/upload\/[^/]+\//, '/image/upload/pg_1,w_480,c_limit,q_auto,f_jpg/');
     u = u.replace(/\.gif$/i, '.jpg');
     return u;
   }
@@ -81,18 +90,24 @@ const getStaticThumbnail = (url: string): string => {
 
 export default function ProjectModal({ item, onClose }: ProjectModalProps) {
   const [activeLightboxIndex, setActiveLightboxIndex] = useState<number | null>(null);
+  const titleId = useId();
 
-  const galleryList = item?.gallery && item.gallery.length > 0
-    ? item.gallery
-    : item?.previewUrl
-    ? [item.previewUrl]
-    : [];
+  const galleryList =
+    item?.gallery && item.gallery.length > 0
+      ? item.gallery
+      : item?.previewUrl
+      ? [item.previewUrl]
+      : [];
 
   const thumbnailRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const contentRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const lightboxRef = useRef<HTMLDivElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const lightboxCloseRef = useRef<HTMLButtonElement>(null);
 
-  // Initialize a dedicated Lenis smooth scroll engine inside the modal for buttery smooth scrolling identical to the main site
+  // Dedicated Lenis smooth scroll inside modal body matching main page curve
   useEffect(() => {
     if (!item || !contentRef.current || !innerRef.current) return;
 
@@ -111,7 +126,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
       touchMultiplier: 1.5,
     });
 
-    let rafId: number;
+    let rafId = 0;
     function raf(time: number) {
       modalLenis.raf(time);
       rafId = requestAnimationFrame(raf);
@@ -124,7 +139,7 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
     };
   }, [item]);
 
-  // Scroll active thumbnail smoothly into view when lightbox index changes
+  // Keep active lightbox thumbnail centered in strip
   useEffect(() => {
     if (activeLightboxIndex !== null && thumbnailRefs.current[activeLightboxIndex]) {
       thumbnailRefs.current[activeLightboxIndex]?.scrollIntoView({
@@ -135,44 +150,115 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
     }
   }, [activeLightboxIndex]);
 
-  // Keyboard navigation, lock body + html scroll, & pause Lenis so background website NEVER scrolls
+  // Lock background scroll and restore focus cleanly on close
   useEffect(() => {
     if (!item) return;
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (activeLightboxIndex !== null) {
-          setActiveLightboxIndex(null);
-        } else {
-          onClose();
-        }
-      } else if (activeLightboxIndex !== null && galleryList.length > 1) {
-        if (e.key === 'ArrowLeft') {
-          setActiveLightboxIndex((prev) =>
-            prev === null ? 0 : (prev - 1 + galleryList.length) % galleryList.length
-          );
-        } else if (e.key === 'ArrowRight') {
-          setActiveLightboxIndex((prev) =>
-            prev === null ? 0 : (prev + 1) % galleryList.length
-          );
-        }
-      }
-    };
+    const previouslyFocused =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
 
     const originalBodyOverflow = document.body.style.overflow;
     const originalHtmlOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
     window.__lenis?.stop();
-    window.addEventListener('keydown', handleKeyDown);
+
+    const focusTimer = requestAnimationFrame(() => {
+      closeButtonRef.current?.focus();
+    });
 
     return () => {
+      cancelAnimationFrame(focusTimer);
       document.body.style.overflow = originalBodyOverflow;
       document.documentElement.style.overflow = originalHtmlOverflow;
       window.__lenis?.start();
-      window.removeEventListener('keydown', handleKeyDown);
+      if (previouslyFocused && document.contains(previouslyFocused)) {
+        previouslyFocused.focus();
+      }
     };
+  }, [item]);
+
+  // Focus active lightbox close button when lightbox opens
+  useEffect(() => {
+    if (activeLightboxIndex === null) return;
+    const frame = requestAnimationFrame(() => {
+      lightboxCloseRef.current?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [activeLightboxIndex]);
+
+  // Keyboard navigation (Escape, ArrowLeft/Right, and Tab focus trap)
+  useEffect(() => {
+    if (!item) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (activeLightboxIndex !== null) {
+          setActiveLightboxIndex(null);
+        } else {
+          onClose();
+        }
+        return;
+      }
+
+      if (activeLightboxIndex !== null && galleryList.length > 1) {
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          setActiveLightboxIndex((prev) =>
+            prev === null ? 0 : (prev - 1 + galleryList.length) % galleryList.length
+          );
+          return;
+        }
+        if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          setActiveLightboxIndex((prev) =>
+            prev === null ? 0 : (prev + 1) % galleryList.length
+          );
+          return;
+        }
+      }
+
+      if (e.key === 'Tab') {
+        const activeContainer =
+          activeLightboxIndex !== null ? lightboxRef.current : dialogRef.current;
+        if (!activeContainer) return;
+
+        const focusable = Array.from(
+          activeContainer.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+        ).filter((el) => el.offsetParent !== null || el === document.activeElement);
+
+        if (focusable.length === 0) {
+          e.preventDefault();
+          return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        const current = document.activeElement;
+
+        if (e.shiftKey) {
+          if (current === first || !activeContainer.contains(current)) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else if (current === last || !activeContainer.contains(current)) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [item, onClose, activeLightboxIndex, galleryList.length]);
+
+  const metaLine = [item?.categoryLabel, item?.role, item?.year, item?.metrics]
+    .filter(Boolean)
+    .join(' · ');
+
+  const visibleGallery = galleryList.length > 3 ? galleryList.slice(0, 3) : galleryList;
+  const remainingCount = galleryList.length > 3 ? galleryList.length - 3 : 0;
 
   return (
     <AnimatePresence>
@@ -181,239 +267,226 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
           data-lenis-prevent
           className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-5 md:p-6 overflow-hidden"
         >
-          {/* Backdrop with frosted dark blur */}
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/85 backdrop-blur-md cursor-pointer"
+            aria-hidden="true"
+            className="fixed inset-0 bg-[#09090b]/85 backdrop-blur-sm cursor-pointer"
           />
 
-          {/* Modal Dialog Card */}
+          {/* Modal Dialog Card matching BentoSection surfaces & typography */}
           <motion.div
+            ref={dialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
             data-lenis-prevent
-            initial={{ opacity: 0, scale: 0.96, y: 16 }}
+            initial={{ opacity: 0, scale: 0.97, y: 14 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 16 }}
-            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full max-w-lg sm:max-w-xl md:max-w-2xl max-h-[85vh] sm:max-h-[88vh] bg-[#161618] border border-[#27272a] rounded-[22px] sm:rounded-[24px] shadow-2xl z-10 flex flex-col overflow-hidden my-auto"
+            exit={{ opacity: 0, scale: 0.97, y: 14 }}
+            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+            className="relative w-full max-w-lg sm:max-w-xl md:max-w-2xl max-h-[88dvh] bg-[var(--card)] border border-[var(--border)] rounded-[24px] sm:rounded-[28px] shadow-[0_24px_64px_-12px_rgba(0,0,0,0.85)] z-10 flex flex-col overflow-hidden my-auto"
           >
-              {/* Header: Clean, refined top bar without clunky badges */}
-              <div className="shrink-0 bg-[#161618] px-4 sm:px-6 py-3.5 border-b border-white/[0.08] flex items-center justify-between">
-                <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-[11px] sm:text-xs font-semibold uppercase tracking-widest text-zinc-400">
-                    {item.categoryLabel || 'Showcase'}
-                  </span>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={onClose}
-                  aria-label="Close modal"
-                  className="size-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors cursor-pointer shrink-0 ml-2"
+            {/* Editorial Header (No uppercase eyebrow above title) */}
+            <div className="shrink-0 px-5 sm:px-7 pt-5 sm:pt-6 pb-4 border-b border-[var(--border)] flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <h2
+                  id={titleId}
+                  className="font-display text-xl sm:text-2xl font-bold tracking-tight text-white leading-snug text-balance"
                 >
-                  <CloseIcon className="size-4" />
-                </button>
-              </div>
-
-              {/* Scrollable Content Area: clean looks without scrollbar, Lenis smooth scrolling */}
-              <div
-                ref={contentRef}
-                data-lenis-prevent
-                tabIndex={0}
-                className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 focus:outline-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-              >
-                <div ref={innerRef} className="space-y-4">
-                {/* Title & Metadata */}
-              <div>
-                <h3 className="text-lg sm:text-xl font-bold tracking-tight text-white leading-tight">
                   {item.title}
-                </h3>
-
-                <p className="text-xs text-zinc-400 font-medium mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                  {[item.role, item.year, item.metrics].filter(Boolean).join(' · ')}
-                </p>
+                </h2>
+                {metaLine && (
+                  <p className="text-xs sm:text-[13px] text-[var(--muted-foreground)] font-medium mt-1.5 leading-relaxed">
+                    {metaLine}
+                  </p>
+                )}
               </div>
 
-              {/* Description */}
-              <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed font-normal">
-                {item.description}
-              </p>
+              <button
+                ref={closeButtonRef}
+                type="button"
+                onClick={onClose}
+                aria-label="Close modal"
+                className="size-11 -mr-1.5 -mt-1.5 rounded-full bg-[#202024] hover:bg-[#28282e] border border-[var(--border)] flex items-center justify-center text-[var(--muted-foreground)] hover:text-white transition-colors cursor-pointer shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                <CloseIcon className="size-4.5" />
+              </button>
+            </div>
 
-              {/* Key Highlights */}
-              {item.details && item.details.length > 0 && (
-                <div className="flex flex-col gap-1.5 pt-0.5">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold text-zinc-400">
-                    Highlights
-                  </span>
-                  <ul className="space-y-1.5 text-xs text-zinc-300">
-                    {item.details.map((detail, idx) => (
-                      <li key={idx} className="flex items-start gap-2 leading-relaxed">
-                        <span className="size-1.5 rounded-full bg-zinc-400 shrink-0 mt-1.5" />
-                        <span>{detail}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+            {/* Scrollable Body (Lenis smooth scroll, hidden scrollbar) */}
+            <div
+              ref={contentRef}
+              data-lenis-prevent
+              tabIndex={0}
+              className="flex-1 min-h-0 overflow-y-auto px-5 sm:px-7 py-5 focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-white/40 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
+              <div ref={innerRef} className="space-y-5">
+                {/* Summary */}
+                <p className="text-xs sm:text-sm text-zinc-200 leading-relaxed font-normal max-w-[65ch] text-pretty">
+                  {item.description}
+                </p>
 
-              {/* Tools / Tech Stack */}
-              {item.tools && item.tools.length > 0 && (
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pt-0.5 text-xs text-zinc-400">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold text-zinc-500">
-                    Tools:
-                  </span>
-                  {item.tools.map((tool, idx) => (
-                    <span key={tool} className="text-zinc-300 font-medium text-xs">
-                      {tool}{idx < item.tools!.length - 1 ? ' ·' : ''}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Discord-style Media Attachment Grid (Symmetrical, square, precision tiles) */}
-              {galleryList.length > 0 && (
-                <div className="pt-1.5">
-                  {galleryList.length === 1 ? (
-                    <button
-                      type="button"
-                      onClick={() => setActiveLightboxIndex(0)}
-                      aria-label={`View ${item.title} preview`}
-                      className="relative w-full aspect-[16/9] max-h-60 rounded-2xl overflow-hidden bg-black/50 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={getStaticThumbnail(galleryList[0])}
-                        alt={item.title}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                      {isMediaVideo(galleryList[0]) && (
-                        <div className="absolute bottom-2.5 right-2.5 size-7 rounded-full bg-black/70 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white pointer-events-none shadow-md">
-                          <svg className="size-3.5 fill-current ml-0.5" viewBox="0 0 24 24">
-                            <path d="M8 5v14l11-7z" />
-                          </svg>
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[1px]">
-                        <div className="size-10 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
-                          <SearchIcon className="size-5" />
-                        </div>
-                      </div>
-                    </button>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-2.5 sm:gap-3 w-full">
-                      {/* Left Thumbnail (Item 0) - Square Aspect Ratio */}
+                {/* Media Showcase: Sized cleanly so tiles & review stay balanced */}
+                {galleryList.length > 0 && (
+                  <div>
+                    {galleryList.length === 1 ? (
                       <button
                         type="button"
                         onClick={() => setActiveLightboxIndex(0)}
-                        aria-label={`View ${item.title} preview 1`}
-                        className="relative aspect-square rounded-2xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm ring-1 ring-white/5"
+                        aria-label={`View ${item.title} preview`}
+                        className="relative w-full aspect-[16/9] max-h-56 rounded-2xl overflow-hidden bg-[#121214] border border-[var(--border)] group cursor-pointer hover:border-zinc-600 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={getStaticThumbnail(galleryList[0])}
-                          alt={`${item.title} preview 1`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          alt={item.title}
+                          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
                           loading="lazy"
                         />
                         {isMediaVideo(galleryList[0]) && (
-                          <div className="absolute bottom-2.5 right-2.5 size-7 rounded-full bg-black/70 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white pointer-events-none shadow-md">
-                            <svg className="size-3.5 fill-current ml-0.5" viewBox="0 0 24 24">
+                          <span className="absolute bottom-3 right-3 size-8 rounded-full bg-[#121212]/90 border border-white/20 flex items-center justify-center text-white pointer-events-none">
+                            <svg className="size-3.5 fill-current ml-0.5" viewBox="0 0 24 24" aria-hidden="true">
                               <path d="M8 5v14l11-7z" />
                             </svg>
-                          </div>
+                          </span>
                         )}
-                        <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[1px]">
-                          <div className="size-10 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
+                        <span className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <span className="size-11 rounded-full bg-[#121212]/90 border border-white/20 flex items-center justify-center text-white">
                             <SearchIcon className="size-5" />
-                          </div>
-                        </div>
+                          </span>
+                        </span>
                       </button>
-
-                      {/* Right Thumbnail (Item 1) - Square Aspect Ratio with Balanced Translucent Overlay */}
-                      <button
-                        type="button"
-                        onClick={() => setActiveLightboxIndex(1)}
-                        aria-label={galleryList.length > 2 ? `View all ${galleryList.length} media items` : `View ${item.title} preview 2`}
-                        className="relative aspect-square rounded-2xl overflow-hidden bg-black/40 border border-white/10 group cursor-pointer hover:border-white/30 transition-all shadow-sm ring-1 ring-white/5"
+                    ) : (
+                      <div
+                        className={`grid gap-2 sm:gap-3 w-full ${
+                          visibleGallery.length === 2 ? 'grid-cols-2' : 'grid-cols-3'
+                        }`}
                       >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={getStaticThumbnail(galleryList[1])}
-                          alt={`${item.title} preview 2`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                        />
-                        {isMediaVideo(galleryList[1]) && galleryList.length <= 2 && (
-                          <div className="absolute bottom-2.5 right-2.5 size-7 rounded-full bg-black/70 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white pointer-events-none shadow-md">
-                            <svg className="size-3.5 fill-current ml-0.5" viewBox="0 0 24 24">
-                              <path d="M8 5v14l11-7z" />
-                            </svg>
-                          </div>
-                        )}
+                        {visibleGallery.map((mediaUrl, idx) => {
+                          const isLastOverflowTile =
+                            idx === visibleGallery.length - 1 && remainingCount > 0;
 
-                        {galleryList.length > 2 ? (
-                          <div className="absolute inset-0 bg-black/45 group-hover:bg-black/35 transition-colors flex flex-col items-center justify-center text-white backdrop-blur-[1px]">
-                            <span className="text-2xl sm:text-3xl font-black tracking-tight drop-shadow-md">
-                              +{galleryList.length - 2}
-                            </span>
-                            <span className="text-[10px] sm:text-[11px] font-bold text-zinc-200 uppercase tracking-widest mt-0.5 drop-shadow">
-                              See More
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[1px]">
-                            <div className="size-10 rounded-full bg-black/60 border border-white/20 flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
-                              <SearchIcon className="size-5" />
-                            </div>
-                          </div>
-                        )}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
+                          return (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => setActiveLightboxIndex(idx)}
+                              aria-label={
+                                isLastOverflowTile
+                                  ? `View all ${galleryList.length} media items`
+                                  : `View ${item.title} preview ${idx + 1}`
+                              }
+                              className="relative aspect-square sm:aspect-[4/3] rounded-xl sm:rounded-2xl overflow-hidden bg-[#121214] border border-[var(--border)] group cursor-pointer hover:border-zinc-500 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={getStaticThumbnail(mediaUrl)}
+                                alt={`${item.title} preview ${idx + 1}`}
+                                className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300"
+                                loading="lazy"
+                              />
 
-              {/* Verified Client Review (from Fiverr) */}
-              {item.clientReview && (
-                <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-white/[0.03] border border-white/[0.08] mb-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-1.5 font-semibold text-zinc-200">
-                      <span>Verified Client Review</span>
-                      <span className="text-zinc-500">·</span>
-                      <span className="text-zinc-400">@{item.clientReview.author}</span>
-                    </div>
-                    <span className="text-white font-bold">
-                      ★ {item.clientReview.rating.toFixed(1)} / 5.0
-                    </span>
+                              {isMediaVideo(mediaUrl) && !isLastOverflowTile && (
+                                <span className="absolute bottom-2 right-2 size-7 rounded-full bg-[#121212]/90 border border-white/20 flex items-center justify-center text-white pointer-events-none">
+                                  <svg className="size-3.5 fill-current ml-0.5" viewBox="0 0 24 24" aria-hidden="true">
+                                    <path d="M8 5v14l11-7z" />
+                                  </svg>
+                                </span>
+                              )}
+
+                              {isLastOverflowTile ? (
+                                <span className="absolute inset-0 bg-[#09090b]/75 group-hover:bg-[#09090b]/60 transition-colors flex flex-col items-center justify-center text-white px-1">
+                                  <span className="font-display text-lg sm:text-2xl font-bold tracking-tight">
+                                    +{remainingCount}
+                                  </span>
+                                  <span className="text-[10px] sm:text-[11px] font-semibold text-zinc-200 tracking-wide mt-0.5">
+                                    View Gallery
+                                  </span>
+                                </span>
+                              ) : (
+                                <span className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                  <span className="size-9 sm:size-10 rounded-full bg-[#121212]/90 border border-white/20 flex items-center justify-center text-white">
+                                    <SearchIcon className="size-4" />
+                                  </span>
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
-                  <p className="text-xs text-zinc-300 italic leading-relaxed">
-                    &ldquo;{item.clientReview.comment}&rdquo;
-                  </p>
-                </div>
-              )}
+                )}
 
-                {/* Dedicated bottom spacer to ensure content and review border are never clipped */}
-                <div className="h-6 shrink-0" aria-hidden="true" />
+                {/* Highlights & Tools (matching i'm faarrel editorial list rhythm) */}
+                {((item.details && item.details.length > 0) ||
+                  (item.tools && item.tools.length > 0)) && (
+                  <div className="border-t border-[var(--border)] pt-4 space-y-3">
+                    {item.details && item.details.length > 0 && (
+                      <ul className="space-y-2 text-xs sm:text-[13px] text-zinc-200 leading-relaxed">
+                        {item.details.map((detail, idx) => (
+                          <li key={idx} className="flex items-start gap-2.5">
+                            <span
+                              className="size-1.5 rounded-full bg-zinc-400 shrink-0 mt-2"
+                              aria-hidden="true"
+                            />
+                            <span>{detail}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {item.tools && item.tools.length > 0 && (
+                      <p className="text-xs font-mono text-[var(--muted-foreground)] leading-relaxed">
+                        {item.tools.join(' · ')}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Verified Client Review (editorial divider, no nested card box) */}
+                {item.clientReview && (
+                  <div className="border-t border-[var(--border)] pt-4 flex flex-col gap-1.5">
+                    <div className="flex items-center justify-between gap-2 text-xs">
+                      <div className="flex items-center gap-1.5 font-semibold text-zinc-100 min-w-0">
+                        <span className="truncate">Verified Client Review</span>
+                        <span className="text-[var(--muted-foreground)]" aria-hidden="true">
+                          ·
+                        </span>
+                        <span className="text-[var(--muted-foreground)] font-mono truncate">
+                          @{item.clientReview.author}
+                        </span>
+                      </div>
+                      <span className="text-white font-bold tabular-nums shrink-0">
+                        ★ {item.clientReview.rating.toFixed(1)} / 5.0
+                      </span>
+                    </div>
+                    <p className="text-xs sm:text-[13px] text-zinc-200 italic leading-relaxed">
+                      &ldquo;{item.clientReview.comment}&rdquo;
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Footer: Symmetrical, precision action bar */}
-            <div className="shrink-0 bg-[#161618] px-4 sm:px-6 py-3.5 border-t border-white/[0.08]">
-              <div className="grid grid-cols-2 gap-2.5 sm:gap-3 w-full">
+            {/* Footer Action Bar matching ContactSection pill buttons */}
+            <div className="shrink-0 bg-[var(--card)] px-4 sm:px-7 py-3.5 sm:py-4 border-t border-[var(--border)]">
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:justify-end sm:gap-3 w-full">
                 {item.externalUrl && (
                   <a
                     href={item.externalUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="h-10 sm:h-11 rounded-xl bg-white/[0.06] hover:bg-white/[0.12] border border-white/10 text-xs sm:text-sm font-semibold text-white flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm hover:border-white/20 active:scale-[0.98]"
+                    className="h-11 px-3 sm:px-5 rounded-full bg-[#18181b] border border-[var(--border)] hover:bg-[#202024] text-zinc-100 text-[11px] sm:text-sm font-semibold flex items-center justify-center gap-1.5 sm:gap-2 transition-colors cursor-pointer sm:w-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                   >
-                    {item.externalType === 'fiverr' && <FiverrIcon className="size-4 shrink-0" />}
-                    {item.externalType === 'discord' && <DiscordIcon className="size-4 shrink-0" />}
-                    {item.externalType === 'github' && <GithubIcon className="size-4 shrink-0" />}
+                    {item.externalType === 'fiverr' && <FiverrIcon className="size-3.5 sm:size-4 shrink-0" />}
+                    {item.externalType === 'discord' && <DiscordIcon className="size-3.5 sm:size-4 shrink-0" />}
+                    {item.externalType === 'github' && <GithubIcon className="size-3.5 sm:size-4 shrink-0" />}
                     <span className="truncate">
                       {item.externalLabel ||
                         (item.externalType === 'fiverr'
@@ -424,76 +497,71 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                           ? 'View on GitHub'
                           : 'View Project')}
                     </span>
-                    <OpenInNewIcon className="size-3.5 text-zinc-400 shrink-0" />
+                    <OpenInNewIcon className="size-3 sm:size-3.5 text-[var(--muted-foreground)] shrink-0" />
                   </a>
                 )}
 
                 <a
                   href="#contact"
                   onClick={onClose}
-                  className={`h-10 sm:h-11 rounded-xl bg-white hover:bg-zinc-200 text-zinc-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm active:scale-[0.98] ${
+                  className={`h-11 px-3 sm:px-6 rounded-full bg-white hover:bg-zinc-200 text-zinc-950 font-semibold text-[11px] sm:text-sm flex items-center justify-center gap-1.5 sm:gap-2 transition-colors cursor-pointer sm:w-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
                     !item.externalUrl ? 'col-span-2' : ''
                   }`}
                 >
-                  <MailIcon className="size-4 shrink-0 text-zinc-950" />
+                  <MailIcon className="size-3.5 sm:size-4 shrink-0 text-zinc-950" />
                   <span>Discuss Project</span>
                 </a>
               </div>
             </div>
           </motion.div>
 
-          {/* Discord-Style Fullscreen Lightbox Preview */}
+          {/* Fullscreen Media Lightbox */}
           <AnimatePresence>
             {activeLightboxIndex !== null && galleryList.length > 0 && (
               <motion.div
+                ref={lightboxRef}
+                role="dialog"
+                aria-modal="true"
+                aria-label={`${item.title} media gallery`}
                 key="lightbox-container"
                 data-lenis-prevent
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
                 className="fixed inset-0 z-[120] flex flex-col justify-between p-3 sm:p-6 overflow-hidden select-none"
               >
-                {/* Backdrop */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2 }}
+                {/* Solid Obsidian Scrim */}
+                <div
                   onClick={() => setActiveLightboxIndex(null)}
-                  className="fixed inset-0 bg-black/95 backdrop-blur-xl cursor-pointer"
+                  aria-hidden="true"
+                  className="fixed inset-0 bg-[#09090b]/95 cursor-pointer"
                 />
 
                 {/* Top Control Bar */}
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  className="relative z-10 flex items-center justify-between w-full max-w-6xl mx-auto py-2 px-1"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono font-medium text-zinc-400 bg-white/10 px-2.5 py-1 rounded-md">
+                <div className="relative z-10 flex items-center justify-between w-full max-w-6xl mx-auto py-1.5 px-1">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="text-xs font-mono font-medium tabular-nums text-zinc-200 bg-[#202024] border border-[var(--border)] px-3 py-1.5 rounded-full shrink-0">
                       {activeLightboxIndex + 1} / {galleryList.length}
                     </span>
-                    <span className="hidden sm:inline-block text-xs font-semibold text-zinc-300 truncate max-w-xs">
+                    <span className="hidden sm:inline-block text-xs sm:text-sm font-semibold text-zinc-200 truncate max-w-md">
                       {item.title}
                     </span>
                   </div>
 
                   <button
+                    ref={lightboxCloseRef}
                     type="button"
                     onClick={() => setActiveLightboxIndex(null)}
                     aria-label="Close preview"
-                    className="size-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-zinc-300 hover:text-white transition-colors cursor-pointer active:scale-95"
+                    className="size-11 rounded-full bg-[#202024] hover:bg-[#28282e] border border-[var(--border)] flex items-center justify-center text-zinc-200 hover:text-white transition-colors cursor-pointer shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                   >
-                    <CloseIcon className="size-4" />
+                    <CloseIcon className="size-4.5" />
                   </button>
-                </motion.div>
+                </div>
 
-                {/* Center Image Display with Arrow Controls */}
-                <div className="relative z-10 flex-1 flex items-center justify-center min-h-0 my-auto px-2 sm:px-12">
-                  {/* Previous Button */}
+                {/* Center Media Stage */}
+                <div className="relative z-10 flex-1 flex items-center justify-center min-h-0 my-auto px-2 sm:px-14">
                   {galleryList.length > 1 && (
                     <button
                       type="button"
@@ -502,21 +570,20 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                           prev === null ? 0 : (prev - 1 + galleryList.length) % galleryList.length
                         )
                       }
-                      aria-label="Previous image"
-                      className="absolute left-1 sm:left-4 z-20 size-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center transition-colors cursor-pointer shadow-lg active:scale-95"
+                      aria-label="Previous media"
+                      className="absolute left-1 sm:left-4 z-20 size-11 rounded-full bg-[#161618] hover:bg-[#202024] border border-[var(--border)] text-white flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                     >
                       <ChevronLeftIcon className="size-5" />
                     </button>
                   )}
 
-                  {/* Active Media (Image or Video) with Smooth Enter & Exit Scale Animation */}
                   <motion.div
                     key={activeLightboxIndex}
-                    initial={{ opacity: 0, scale: 0.92 }}
+                    initial={{ opacity: 0, scale: 0.94 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.92 }}
-                    transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-                    className="relative max-w-full max-h-[66vh] sm:max-h-[72vh] flex items-center justify-center"
+                    exit={{ opacity: 0, scale: 0.94 }}
+                    transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                    className="relative max-w-full max-h-[66dvh] sm:max-h-[72dvh] flex items-center justify-center"
                   >
                     {isMediaVideo(galleryList[activeLightboxIndex]) ? (
                       <video
@@ -526,19 +593,18 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                         loop
                         controls
                         playsInline
-                        className="max-w-full max-h-[66vh] sm:max-h-[72vh] object-contain rounded-xl border border-white/15 shadow-2xl bg-black"
+                        className="max-w-full max-h-[66dvh] sm:max-h-[72dvh] object-contain rounded-2xl border border-[var(--border)] bg-black"
                       />
                     ) : (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         src={galleryList[activeLightboxIndex]}
-                        alt={`${item.title} enlarged ${activeLightboxIndex + 1}`}
-                        className="max-w-full max-h-[66vh] sm:max-h-[72vh] object-contain rounded-xl border border-white/15 shadow-2xl bg-black/60"
+                        alt={`${item.title} preview ${activeLightboxIndex + 1}`}
+                        className="max-w-full max-h-[66dvh] sm:max-h-[72dvh] object-contain rounded-2xl border border-[var(--border)] bg-[#121214]"
                       />
                     )}
                   </motion.div>
 
-                  {/* Next Button */}
                   {galleryList.length > 1 && (
                     <button
                       type="button"
@@ -547,24 +613,18 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                           prev === null ? 0 : (prev + 1) % galleryList.length
                         )
                       }
-                      aria-label="Next image"
-                      className="absolute right-1 sm:right-4 z-20 size-10 rounded-full bg-black/60 hover:bg-black/90 border border-white/20 text-white flex items-center justify-center transition-colors cursor-pointer shadow-lg active:scale-95"
+                      aria-label="Next media"
+                      className="absolute right-1 sm:right-4 z-20 size-11 rounded-full bg-[#161618] hover:bg-[#202024] border border-[var(--border)] text-white flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                     >
                       <ChevronRightIcon className="size-5" />
                     </button>
                   )}
                 </div>
 
-                {/* Bottom Discord-Style Thumbnail Strip */}
+                {/* Thumbnail Strip */}
                 {galleryList.length > 1 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 12 }}
-                    transition={{ duration: 0.2 }}
-                    className="relative z-10 w-full max-w-4xl mx-auto px-4 pt-2 pb-1.5 flex justify-center"
-                  >
-                    <div className="flex items-center gap-2 sm:gap-2.5 px-3.5 py-2.5 bg-[#121214]/90 border border-white/10 rounded-2xl backdrop-blur-md max-w-full overflow-x-auto shadow-2xl [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  <div className="relative z-10 w-full max-w-4xl mx-auto px-4 pt-2 pb-1.5 flex justify-center">
+                    <div className="flex items-center gap-2 sm:gap-2.5 px-3 py-2 bg-[#161618] border border-[var(--border)] rounded-2xl max-w-full overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                       {galleryList.map((thumbUrl, idx) => {
                         const isActive = idx === activeLightboxIndex;
                         const poster = getStaticThumbnail(thumbUrl);
@@ -577,23 +637,24 @@ export default function ProjectModal({ item, onClose }: ProjectModalProps) {
                             type="button"
                             onClick={() => setActiveLightboxIndex(idx)}
                             aria-label={`Go to preview ${idx + 1}`}
-                            className={`size-11 sm:size-12 rounded-lg overflow-hidden shrink-0 border-2 transition-all cursor-pointer ${
+                            aria-current={isActive ? 'true' : undefined}
+                            className={`size-11 sm:size-12 rounded-xl overflow-hidden shrink-0 border-2 transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
                               isActive
-                                ? 'border-white scale-105 opacity-100 shadow-md ring-2 ring-white/20'
-                                : 'border-transparent opacity-50 hover:opacity-85'
+                                ? 'border-white scale-105 opacity-100'
+                                : 'border-transparent opacity-55 hover:opacity-90'
                             }`}
                           >
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                               src={poster}
-                              alt={`Thumb ${idx + 1}`}
+                              alt={`Thumbnail ${idx + 1}`}
                               className="w-full h-full object-cover"
                             />
                           </button>
                         );
                       })}
                     </div>
-                  </motion.div>
+                  </div>
                 )}
               </motion.div>
             )}
