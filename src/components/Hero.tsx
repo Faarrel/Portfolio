@@ -1,7 +1,8 @@
 'use client';
 
+import { useRef } from 'react';
 import { motion } from 'framer-motion';
-import BreathingText from '@/components/ui/breathing-text';
+import VariableFontCursorProximity from '@/components/ui/variable-font-cursor-proximity';
 
 const DISCIPLINES = [
   'GRAPHIC DESIGN',
@@ -11,8 +12,10 @@ const DISCIPLINES = [
 ];
 
 export default function Hero() {
+  const containerRef = useRef<HTMLElement | null>(null);
+
   return (
-    <section id="hero" className="relative min-h-[100svh] min-h-[100dvh] flex flex-col justify-between pt-20 sm:pt-36 pb-4 sm:pb-8 px-4 sm:px-8 md:px-12 bg-transparent overflow-hidden">
+    <section ref={containerRef} id="hero" className="relative min-h-[100svh] min-h-[100dvh] flex flex-col justify-between pt-20 sm:pt-36 pb-4 sm:pb-8 px-4 sm:px-8 md:px-12 bg-transparent overflow-hidden">
       {/* Background Soft Lighting Glow behind huge text */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[600px] md:w-[900px] h-[250px] sm:h-[350px] bg-white/[0.04] rounded-full blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
 
@@ -40,14 +43,15 @@ export default function Hero() {
             className="flex justify-center items-center w-full max-w-full overflow-hidden"
           >
             <h1 className="hero-title text-[13.5vw] sm:text-8xl md:text-9xl lg:text-[11rem] xl:text-[13rem] leading-none text-white uppercase select-none my-2 sm:my-4">
-              <BreathingText
-                fromWeight={900}
-                toWeight={100}
-                duration={2.0}
-                staggerDuration={0.08}
+              <VariableFontCursorProximity
+                fromFontVariationSettings="'wght' 400"
+                toFontVariationSettings="'wght' 900"
+                radius={240}
+                falloff="gaussian"
+                containerRef={containerRef}
               >
                 FAARREL
-              </BreathingText>
+              </VariableFontCursorProximity>
             </h1>
           </motion.div>
         </div>
