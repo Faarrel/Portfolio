@@ -1,8 +1,8 @@
 export const WORD = ["F", "A", "A", "R", "R", "E", "L"] as const;
-export const T = 28; // stem thickness in viewBox units
-export const CELLS = [84, 106, 106, 96, 96, 84, 80] as const;
-export const GAP = 12;
-export const VB_W = CELLS.reduce((a, b) => a + b, 0) + GAP * (CELLS.length - 1); // 724
+export const T = 24; // balanced geometric Montserrat-style stroke thickness
+export const CELLS = [96, 118, 118, 106, 106, 96, 90] as const;
+export const GAP = 16;
+export const VB_W = CELLS.reduce((a, b) => a + b, 0) + GAP * (CELLS.length - 1); // 826
 export const STRETCH = 1.89;
 export const NEAR = 0.139;
 export const FAR = 0.462;
@@ -18,8 +18,9 @@ export const approach = (cur: number, target: number, dt: number, tau: number) =
 export const cellX = (i: number) => CELLS.slice(0, i).reduce((a, b) => a + b, 0) + GAP * i;
 export const cellMid = (i: number) => cellX(i) + CELLS[i] / 2;
 
+/** Geometric Montserrat proportions (~34% stage height on desktop, balanced clamp on narrow mobile). */
 export const baseFor = (H: number, scale: number) =>
-  scale > 0 ? Math.min(Math.max(Math.round((0.43 * H) / scale), 120), 460) : 220;
+  scale > 0 ? Math.min(Math.max(Math.round((0.34 * H) / scale), 136), 210) : 172;
 
 export const vbH = (base: number) => Math.ceil(base * STRETCH + 4);
 
@@ -29,8 +30,8 @@ export const pullAt = (d: number, W: number) =>
 export const f = (n: number) => (Math.round(n * 10) / 10).toString();
 
 /**
- * Generates an open-stroke glyph path where only vertical/bottom stems stretch with `h`
- * while upper bowls, crossbars, and junctions remain pinned to `base`.
+ * Generates Montserrat-proportioned geometric SVG glyph paths where only bottom vertical
+ * stems lengthen with `h`, keeping upper bowls, diagonals, and crossbars anchored to `base`.
  */
 export function glyph(ch: (typeof WORD)[number], ox: number, w: number, h: number, base: number) {
   h = Math.max(h, base);
@@ -43,31 +44,31 @@ export function glyph(ch: (typeof WORD)[number], ox: number, w: number, h: numbe
 
   switch (ch) {
     case "F": {
-      const m = top + (bb - top) * 0.46;
+      const m = top + (bb - top) * 0.48;
       return (
         "M" + f(a) + " 0V" + f(h) +
         "M" + f(a) + " " + f(top) + "H" + f(ox + w) +
-        "M" + f(a) + " " + f(m) + "H" + f(ox + w - 10)
+        "M" + f(a) + " " + f(m) + "H" + f(ox + w - 14)
       );
     }
     case "A": {
       const mid = (a + b) / 2;
-      const elbow = top + (bb - top) * 0.48;
-      const m = top + (bb - top) * 0.66;
+      const elbow = top + (bb - top) * 0.56;
+      const m = top + (bb - top) * 0.68;
       return (
         "M" + f(a) + " " + f(h) +
         "V" + f(elbow) +
-        "L" + f(mid - 12) + " " + f(top) +
-        "H" + f(mid + 12) +
+        "L" + f(mid - 11) + " " + f(top) +
+        "H" + f(mid + 11) +
         "L" + f(b) + " " + f(elbow) +
         "V" + f(h) +
         "M" + f(a) + " " + f(m) + "H" + f(b)
       );
     }
     case "R": {
-      const m = top + (bb - top) * 0.46;
-      const ru = Math.min(r * 0.9, (m - top) / 2);
-      const rl = Math.min(r * 0.85, (bb - m) * 0.48);
+      const m = top + (bb - top) * 0.5;
+      const ru = Math.min(r * 0.85, (m - top) / 2);
+      const knee = m + (bb - m) * 0.62;
       return (
         "M" + f(a) + " 0V" + f(h) +
         "M" + f(a) + " " + f(top) +
@@ -76,9 +77,8 @@ export function glyph(ch: (typeof WORD)[number], ox: number, w: number, h: numbe
         "V" + f(m - ru) +
         "A" + f(ru) + " " + f(ru) + " 0 0 1 " + f(b - ru) + " " + f(m) +
         "H" + f(a) +
-        "M" + f(a + r * 0.45) + " " + f(m) +
-        "H" + f(b - rl) +
-        "A" + f(rl) + " " + f(rl) + " 0 0 1 " + f(b) + " " + f(m + rl) +
+        "M" + f(a + (b - a) * 0.44) + " " + f(m) +
+        "L" + f(b) + " " + f(knee) +
         "V" + f(h)
       );
     }
@@ -87,7 +87,7 @@ export function glyph(ch: (typeof WORD)[number], ox: number, w: number, h: numbe
       return (
         "M" + f(a) + " 0V" + f(h) +
         "M" + f(a) + " " + f(top) + "H" + f(ox + w) +
-        "M" + f(a) + " " + f(m) + "H" + f(ox + w - 10) +
+        "M" + f(a) + " " + f(m) + "H" + f(ox + w - 14) +
         "M" + f(a) + " " + f(bot) + "H" + f(ox + w)
       );
     }

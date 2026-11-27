@@ -36,17 +36,17 @@ export default function Hero() {
   const spinRef = useRef<HTMLDivElement | null>(null);
   const clipId = 'faarrel-clip-' + useId().replace(/[^a-zA-Z0-9]/g, '');
 
-  const [base, setBase] = useState(220);
+  const [base, setBase] = useState(172);
 
   const stateRef = useRef({
     W: 0,
     H: 0,
-    base: 220,
+    base: 172,
     wordX: 0,
     wordW: 1,
     centres: WORD.map(() => 0),
-    hs: WORD.map(() => 220),
-    tg: WORD.map(() => 220),
+    hs: WORD.map(() => 172),
+    tg: WORD.map(() => 172),
     fine: false,
     still: false,
     top: 0,
@@ -298,7 +298,7 @@ export default function Hero() {
                     <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-lg border border-white/15 bg-white/[0.03] flex items-center justify-center p-2">
                       <img src="/logo.webp" alt="" className="w-full h-full object-contain" />
                     </div>
-                    <span className="font-planet-kosmos text-[9px] sm:text-xs tracking-wider text-white">
+                    <span className="font-sans font-extrabold text-[10px] sm:text-xs tracking-[0.22em] text-white">
                       FAARREL
                     </span>
                   </div>
