@@ -92,7 +92,7 @@ html, body {
 .hero-box {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: 54%;
   --s: clamp(96px, 13.5vw, 204px);
   width: var(--s);
   height: calc(var(--s) * 1.86);

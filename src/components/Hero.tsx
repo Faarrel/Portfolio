@@ -1,18 +1,16 @@
 'use client';
 
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   WORD,
-  T,
+  BASE,
   CELLS,
   VB_W,
+  VB_H,
   TAU_LETTER,
   TAU_LOOK,
   SPIN,
-  baseFor,
-  vbH,
-  cellX,
   cellMid,
   approach,
   lookAt,
@@ -36,17 +34,14 @@ export default function Hero() {
   const spinRef = useRef<HTMLDivElement | null>(null);
   const clipId = 'faarrel-clip-' + useId().replace(/[^a-zA-Z0-9]/g, '');
 
-  const [base, setBase] = useState(172);
-
   const stateRef = useRef({
     W: 0,
     H: 0,
-    base: 172,
     wordX: 0,
     wordW: 1,
     centres: WORD.map(() => 0),
-    hs: WORD.map(() => 172),
-    tg: WORD.map(() => 172),
+    hs: WORD.map(() => BASE),
+    tg: WORD.map(() => BASE),
     fine: false,
     still: false,
     top: 0,
@@ -96,13 +91,6 @@ export default function Hero() {
       }
       const scale = st.wordW / VB_W;
       st.centres = WORD.map((_, i) => st.wordX + cellMid(i) * scale);
-      const b = baseFor(st.H, scale);
-      if (b !== st.base) {
-        st.base = b;
-        st.hs = WORD.map(() => b);
-        st.tg = WORD.map(() => b);
-        setBase(b);
-      }
       schedule();
     };
 
@@ -121,13 +109,13 @@ export default function Hero() {
       const px = !st.still && heroUp && pointing ? st.px - st.left : null;
 
       let busy = false;
-      stretchTargets(px, st.centres, st.W, st.base, st.tg);
+      stretchTargets(px, st.centres, st.W, st.tg);
 
       for (let i = 0; i < WORD.length; i++) {
         st.hs[i] = st.still ? st.tg[i] : approach(st.hs[i], st.tg[i], dt, TAU_LETTER);
-        if (Math.abs(st.hs[i] - st.tg[i]) > 0.3) busy = true;
+        if (Math.abs(st.hs[i] - st.tg[i]) > 1.2) busy = true;
 
-        const d = glyph(WORD[i], cellX(i), CELLS[i], st.hs[i], st.base);
+        const d = glyph(WORD[i], CELLS[i].x, st.hs[i]);
         if (d !== st.lastD[i]) {
           st.lastD[i] = d;
           pathsRef.current[i]?.setAttribute('d', d);
@@ -237,8 +225,6 @@ export default function Hero() {
     };
   }, []);
 
-  const vbh = vbH(base);
-
   return (
     <section
       ref={rootRef}
@@ -248,19 +234,19 @@ export default function Hero() {
       {/* Background Soft Lighting Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[600px] md:w-[900px] h-[250px] sm:h-[350px] bg-white/[0.04] rounded-full blur-[100px] sm:blur-[140px] pointer-events-none -z-10" />
 
-      {/* Full-Width Top-Anchored Interactive Stretch Wordmark (BUNKUM structure) */}
+      {/* Full-Width Authentic Montserrat ExtraBold Stretch Wordmark */}
       <div
         ref={wordRef}
-        className="absolute left-[10px] right-[10px] sm:left-[18px] sm:right-[18px] top-[86px] sm:top-[clamp(86px,10vh,104px)] z-10 pointer-events-none"
+        className="absolute left-[10px] right-[10px] sm:left-[18px] sm:right-[18px] top-[92px] sm:top-[clamp(88px,10.5vh,108px)] z-10 pointer-events-none"
       >
         <h1 className="sr-only">FAARREL</h1>
         <svg
-          viewBox={`0 0 ${VB_W} ${vbh}`}
+          viewBox={`0 0 ${VB_W} ${VB_H}`}
           className="block w-full h-auto overflow-visible text-white"
           aria-hidden="true"
         >
           <clipPath id={clipId}>
-            <rect x={-20} y={0} width={VB_W + 40} height={vbh + 400} />
+            <rect x={-50} y={0} width={VB_W + 100} height={VB_H + 200} />
           </clipPath>
           <g clipPath={`url(#${clipId})`}>
             {WORD.map((ch, i) => (
@@ -269,13 +255,9 @@ export default function Hero() {
                 ref={(el) => {
                   pathsRef.current[i] = el;
                 }}
-                d={glyph(ch, cellX(i), CELLS[i], base, base)}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={T}
-                strokeLinecap="butt"
-                strokeLinejoin="miter"
-                strokeMiterlimit={2}
+                d={glyph(ch, CELLS[i].x, BASE)}
+                fill="currentColor"
+                fillRule="evenodd"
               />
             ))}
           </g>

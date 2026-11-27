@@ -1,9 +1,20 @@
 export const WORD = ["F", "A", "A", "R", "R", "E", "L"] as const;
-export const T = 24; // balanced geometric Montserrat-style stroke thickness
-export const CELLS = [96, 118, 118, 106, 106, 96, 90] as const;
-export const GAP = 16;
-export const VB_W = CELLS.reduce((a, b) => a + b, 0) + GAP * (CELLS.length - 1); // 826
-export const STRETCH = 1.89;
+export const BASE = 700; // true Montserrat ExtraBold cap height (unitsPerEm = 1000)
+
+/** Optical x-offsets and widths derived directly from Montserrat ExtraBold metrics. */
+export const CELLS = [
+  { x: 0, w: 619, mid: 344 },      // F
+  { x: 602, w: 786, mid: 995 },    // A (kerns tucked slightly under F's top arm)
+  { x: 1430, w: 786, mid: 1823 },  // A
+  { x: 2210, w: 715, mid: 2602 },  // R
+  { x: 2930, w: 715, mid: 3322 },  // R
+  { x: 3660, w: 632, mid: 4011 },  // E
+  { x: 4310, w: 602, mid: 4646 },  // L
+] as const;
+
+export const VB_W = 4912;
+export const STRETCH = 2.15;
+export const VB_H = Math.ceil(BASE * STRETCH + 40);
 export const NEAR = 0.139;
 export const FAR = 0.462;
 export const TAU_LETTER = 105;
@@ -15,14 +26,7 @@ export const clamp01 = (x: number) => (x < 0 ? 0 : x > 1 ? 1 : x);
 export const approach = (cur: number, target: number, dt: number, tau: number) =>
   target + (cur - target) * Math.exp(-Math.max(0, dt) / tau);
 
-export const cellX = (i: number) => CELLS.slice(0, i).reduce((a, b) => a + b, 0) + GAP * i;
-export const cellMid = (i: number) => cellX(i) + CELLS[i] / 2;
-
-/** Geometric Montserrat proportions (~34% stage height on desktop, balanced clamp on narrow mobile). */
-export const baseFor = (H: number, scale: number) =>
-  scale > 0 ? Math.min(Math.max(Math.round((0.34 * H) / scale), 136), 210) : 172;
-
-export const vbH = (base: number) => Math.ceil(base * STRETCH + 4);
+export const cellMid = (i: number) => CELLS[i].mid;
 
 export const pullAt = (d: number, W: number) =>
   W > 0 ? clamp01((FAR * W - Math.abs(d)) / ((FAR - NEAR) * W)) : 0;
@@ -30,76 +34,56 @@ export const pullAt = (d: number, W: number) =>
 export const f = (n: number) => (Math.round(n * 10) / 10).toString();
 
 /**
- * Generates Montserrat-proportioned geometric SVG glyph paths where only bottom vertical
- * stems lengthen with `h`, keeping upper bowls, diagonals, and crossbars anchored to `base`.
+ * Generates authentic Montserrat ExtraBold SVG outlines (`fillRule="evenodd"`)
+ * where only the flat-bottom stems/feet extend downward by `dh = h - BASE`,
+ * keeping curves, diagonals, and crossbars 100% locked to the typeface geometry.
  */
-export function glyph(ch: (typeof WORD)[number], ox: number, w: number, h: number, base: number) {
-  h = Math.max(h, base);
-  const a = ox + T / 2;
-  const b = ox + w - T / 2;
-  const top = T / 2;
-  const bot = h - T / 2;
-  const bb = base - T / 2;
-  const r = (b - a) / 2;
+export function glyph(ch: (typeof WORD)[number], ox: number, h: number) {
+  const dh = Math.max(0, h - BASE);
+  const bot = f(BASE + dh);
 
   switch (ch) {
-    case "F": {
-      const m = top + (bb - top) * 0.48;
+    case "F":
       return (
-        "M" + f(a) + " 0V" + f(h) +
-        "M" + f(a) + " " + f(top) + "H" + f(ox + w) +
-        "M" + f(a) + " " + f(m) + "H" + f(ox + w - 14)
+        `M${ox + 70} ${bot}V0H${ox + 619}V153H${ox + 268}V307H${ox + 577}V460H${ox + 268}V${bot}Z`
       );
-    }
-    case "A": {
-      const mid = (a + b) / 2;
-      const elbow = top + (bb - top) * 0.56;
-      const m = top + (bb - top) * 0.68;
+    case "A":
       return (
-        "M" + f(a) + " " + f(h) +
-        "V" + f(elbow) +
-        "L" + f(mid - 11) + " " + f(top) +
-        "H" + f(mid + 11) +
-        "L" + f(b) + " " + f(elbow) +
-        "V" + f(h) +
-        "M" + f(a) + " " + f(m) + "H" + f(b)
+        `M${ox - 14} ${bot}V700L${ox + 295} 0H${ox + 490}L${ox + 800} 700V${bot}H${ox + 594}V700L${ox + 539} 564H${ox + 243}L${ox + 188} 700V${bot}Z` +
+        `M${ox + 301} 418H${ox + 481}L${ox + 391} 194Z`
       );
-    }
-    case "R": {
-      const m = top + (bb - top) * 0.5;
-      const ru = Math.min(r * 0.85, (m - top) / 2);
-      const knee = m + (bb - m) * 0.62;
+    case "R":
       return (
-        "M" + f(a) + " 0V" + f(h) +
-        "M" + f(a) + " " + f(top) +
-        "H" + f(b - ru) +
-        "A" + f(ru) + " " + f(ru) + " 0 0 1 " + f(b) + " " + f(top + ru) +
-        "V" + f(m - ru) +
-        "A" + f(ru) + " " + f(ru) + " 0 0 1 " + f(b - ru) + " " + f(m) +
-        "H" + f(a) +
-        "M" + f(a + (b - a) * 0.44) + " " + f(m) +
-        "L" + f(b) + " " + f(knee) +
-        "V" + f(h)
+        `M${ox + 70} ${bot}V0H${ox + 383}` +
+        `Q${ox + 537} 0 ${ox + 619} 69.5` +
+        `Q${ox + 701} 139 ${ox + 701} 259` +
+        `Q${ox + 701} 336 ${ox + 665} 392.5` +
+        `Q${ox + 629} 449 ${ox + 563} 480` +
+        `L${ox + 715} 700V${bot}H${ox + 503}V700L${ox + 376} 514H${ox + 268}V${bot}Z` +
+        `M${ox + 268} 361H${ox + 378}` +
+        `Q${ox + 440} 361 ${ox + 470.5} 334` +
+        `Q${ox + 501} 307 ${ox + 501} 259` +
+        `Q${ox + 501} 210 ${ox + 470.5} 183` +
+        `Q${ox + 440} 156 ${ox + 378} 156H${ox + 268}Z`
       );
-    }
     case "E": {
-      const m = top + (bb - top) * 0.48;
+      const topOfFoot = f(547 + dh);
       return (
-        "M" + f(a) + " 0V" + f(h) +
-        "M" + f(a) + " " + f(top) + "H" + f(ox + w) +
-        "M" + f(a) + " " + f(m) + "H" + f(ox + w - 14) +
-        "M" + f(a) + " " + f(bot) + "H" + f(ox + w)
+        `M${ox + 70} ${bot}V0H${ox + 619}V153H${ox + 266}V271H${ox + 577}V419H${ox + 266}V${topOfFoot}H${ox + 632}V${bot}Z`
       );
     }
     case "L": {
-      return "M" + f(a) + " 0V" + f(bot) + "H" + f(ox + w);
+      const topOfFoot = f(543 + dh);
+      return (
+        `M${ox + 70} ${bot}V0H${ox + 268}V${topOfFoot}H${ox + 602}V${bot}Z`
+      );
     }
   }
 }
 
-export function stretchTargets(px: number | null, centres: number[], W: number, base: number, out: number[]) {
+export function stretchTargets(px: number | null, centres: number[], W: number, out: number[]) {
   for (let i = 0; i < WORD.length; i++) {
-    out[i] = px === null ? base : base * (1 + (STRETCH - 1) * pullAt((centres[i] ?? 0) - px, W));
+    out[i] = px === null ? BASE : BASE * (1 + (STRETCH - 1) * pullAt((centres[i] ?? 0) - px, W));
   }
   return out;
 }
