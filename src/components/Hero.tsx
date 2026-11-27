@@ -41,10 +41,10 @@ export default function Hero() {
           >
             <h1 className="hero-title text-[13.5vw] sm:text-8xl md:text-9xl lg:text-[11rem] xl:text-[13rem] leading-none text-white uppercase select-none my-2 sm:my-4">
               <BreathingText
-                fromWeight={100}
-                toWeight={900}
+                fromWeight={900}
+                toWeight={100}
                 duration={2.0}
-                staggerDuration={0.1}
+                staggerDuration={0.08}
               >
                 FAARREL
               </BreathingText>

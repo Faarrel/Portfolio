@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import { cn } from "@/lib/utils";
 
 export interface BreathingTextProps extends React.HTMLAttributes<HTMLSpanElement> {
@@ -13,39 +11,19 @@ export interface BreathingTextProps extends React.HTMLAttributes<HTMLSpanElement
 
 export const BreathingText = ({
   children,
-  fromWeight = 100,
-  toWeight = 900,
+  fromWeight = 900,
+  toWeight = 100,
   duration = 2.0,
-  staggerDuration = 0.1,
+  staggerDuration = 0.08,
   className,
   ...props
 }: BreathingTextProps) => {
-  const containerRef = useRef<HTMLSpanElement | null>(null);
-  const [isInView, setIsInView] = useState(true);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el || typeof IntersectionObserver === "undefined") return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsInView(entry.isIntersecting);
-      },
-      { threshold: 0.05 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   const letters = String(children).split("");
 
   return (
     <span
-      ref={containerRef}
       className={cn(
         "breathing-text-root relative inline-block select-none after:invisible after:h-0 after:block after:content-[attr(data-text)] after:font-black after:pointer-events-none after:overflow-hidden after:select-none",
-        !isInView && "breathing-text-paused",
         className
       )}
       data-text={children}
@@ -55,7 +33,7 @@ export const BreathingText = ({
         @property --breathe-wght {
           syntax: '<number>';
           inherits: false;
-          initial-value: 100;
+          initial-value: ${fromWeight};
         }
 
         @keyframes breathe-wave {
@@ -75,13 +53,19 @@ export const BreathingText = ({
           --breathe-wght: ${fromWeight};
           font-variation-settings: 'wght' var(--breathe-wght);
           font-weight: var(--breathe-wght);
+          transition: --breathe-wght 0.45s ease-out;
+        }
+
+        .breathing-text-root:has(.breathing-letter:hover) .breathing-letter {
           animation: breathe-wave ${duration}s ease-in-out infinite;
           animation-delay: calc(var(--letter-i, 0) * ${staggerDuration}s);
           will-change: font-variation-settings, font-weight;
         }
 
-        .breathing-text-paused .breathing-letter {
-          animation-play-state: paused !important;
+        @media (prefers-reduced-motion: reduce) {
+          .breathing-text-root:has(.breathing-letter:hover) .breathing-letter {
+            animation: none;
+          }
         }
       `}</style>
 
