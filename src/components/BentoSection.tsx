@@ -217,7 +217,7 @@ export default function BentoSection() {
           className="mb-8 sm:mb-12 flex flex-col sm:flex-row sm:items-end justify-between gap-4"
         >
           <div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white text-balance">
+            <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white text-balance">
               identity &amp; craft<span className="text-[#888888]">.</span>
             </h2>
           </div>

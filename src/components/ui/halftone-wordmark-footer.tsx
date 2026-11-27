@@ -96,8 +96,8 @@ const DEFAULT_COLUMNS: FooterColumn[] = [
   },
 ]
 
-const SANS_STACK = 'Montserrat, "Helvetica Neue", Arial, sans-serif'
-const MONO_STACK = 'var(--font-montserrat), Montserrat, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+const SANS_STACK = '"Helvetica Neue", Arial, sans-serif'
+const MONO_STACK = 'var(--font-geist-mono), var(--font-outfit), ui-monospace, SFMono-Regular, monospace'
 
 // #region halftone
 // Pure helpers, lifted out and executed by tests/halftone-wordmark-footer.test.mjs.
@@ -223,7 +223,7 @@ export default function HalftoneWordmarkFooter({
   crop = 0.22,
   grain = 0.4,
   interactive = true,
-  fontFamily = SANS_STACK,
+  fontFamily = "",
   fontWeight = 800,
   monoFamily = MONO_STACK,
   height = "560px",
@@ -279,11 +279,12 @@ export default function HalftoneWordmarkFooter({
       mask.height = h
       const m = mask.getContext("2d", { willReadFrequently: true })
       if (!m) return
-      const face = o.fontWeight + " 100px " + o.fontFamily
+      const fontStack = o.fontFamily || getComputedStyle(root).fontFamily || SANS_STACK
+      const face = o.fontWeight + " 100px " + fontStack
       m.font = face
       const word = o.wordmark || " "
       const fit = hwfFitSize(m.measureText(word).width, w * 1.02)
-      m.font = o.fontWeight + " " + fit + "px " + o.fontFamily
+      m.font = o.fontWeight + " " + fit + "px " + fontStack
       const box = m.measureText(word)
       const cap = box.actualBoundingBoxAscent || fit * 0.72
       const c = Math.max(0, Math.min(0.6, o.crop))
@@ -497,7 +498,7 @@ export default function HalftoneWordmarkFooter({
   return (
     <footer
       ref={rootRef}
-      className={"hwf-root " + className}
+      className={"hwf-root font-display " + className}
       suppressHydrationWarning
       style={
         {

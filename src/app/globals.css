@@ -12,9 +12,10 @@
   font-family: var(--font-planet-kosmos), 'Planet Kosmos', sans-serif !important;
 }
 
-@theme {
-  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, monospace;
+@theme inline {
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-recursive), var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
 }
 
 :root {
@@ -47,7 +48,7 @@ html {
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans);
+  font-family: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
   overflow-x: hidden;
 }
 
