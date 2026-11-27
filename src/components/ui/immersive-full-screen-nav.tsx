@@ -277,6 +277,7 @@ function FullscreenNav({
       <header className={`fixed top-0 left-0 right-0 z-70 flex h-20 items-center justify-between px-6 sm:px-8 bg-[#121212]/80 backdrop-blur-md ${headerClassName}`}>
         <a
           href={brandHref}
+          aria-label={brand}
           onClick={(e) => {
             if (isOpen) {
               e.preventDefault();
@@ -290,15 +291,9 @@ function FullscreenNav({
               window.scrollTo({ top: 0, behavior: "smooth" });
             }
           }}
-          className="cursor-pointer transition-colors duration-300 flex items-center gap-2.5 group"
-          style={{ color: isOpen ? headerOpenColor : "#E0E0E0" }}
+          className="cursor-pointer transition-colors duration-300 flex items-center group"
         >
-          <img src="/logo.webp" alt="Faarrel" className="w-7 h-7 sm:w-8 sm:h-8 object-contain transition-transform duration-300 group-hover:scale-105" />
-          <span
-            className="font-inktera text-base sm:text-lg font-normal tracking-wide text-white transition-colors duration-300"
-          >
-            {brand}
-          </span>
+          <img src="/logo.webp" alt={brand} className="w-9 h-9 sm:w-11 sm:h-11 object-contain transition-transform duration-300 group-hover:scale-105" />
         </a>
 
         <div className="flex items-center gap-4">
